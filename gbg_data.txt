@@ -1,0 +1,45 @@
+Instructions for entering your graph braid group data:
+
+1. Navigate to the empty template in this file below the dotted line.
+
+2. Enter the number of particles/strands in your braid group.
+
+3. Enter the adjacency matrix of your graph, following the guidelines below:
+- Enter each row of the matrix on a new line.
+- Separate each column with a single space.
+- Make sure your graph does not contain any loops or multi-edges.
+- Additionally, if your graph braid group has n particles:
+-- Make sure all cycles in your graph have length at least n+1.
+-- Make sure all paths between vertices of degree not equal to 1 have length at least n-1.
+(Not doing the last two steps will produce computations for RB_n(\Gamma) instead of B_n(\Gamma).)
+
+4. Enter an initial configuration for your particles, following the guidelines below:
+- Enter the row numbers (in the adjacency matrix) of the vertices of the graph that your particles start at.
+- Separate each number with a space.
+- Row numbering begins at 1.
+- If your graph is connected, this can be left blank.
+
+Example:
+
+Number of particles: 3
+Adjacency matrix:
+0 1 1 0 0 0 0 0 0 0 0 0
+1 0 0 1 0 0 0 0 0 0 0 0
+1 0 0 1 1 0 0 0 0 0 0 0
+0 1 1 0 0 0 0 0 0 0 0 0
+0 0 1 0 0 1 0 0 0 0 0 0
+0 0 0 0 1 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 1 1 0 0 0
+0 0 0 0 0 0 1 0 0 1 0 0
+0 0 0 0 0 0 1 0 0 1 0 0
+0 0 0 0 0 0 0 1 1 0 0 1
+0 0 0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1 1 0
+Initial configuration: 2 4 12
+
+Please enter your data below the dotted line.
+--------------------------------------------------
+Number of particles: 
+Adjacency matrix:
+
+Initial configuration: 

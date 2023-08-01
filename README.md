@@ -10,7 +10,9 @@ Please note: it has not yet been proven whether all free splittings of graph bra
 - the number of particles/strands;
 - the adjacency matrix for your graph;
 - an initial configuration of the particles, if required.
+
 Detailed instructions are given in the file.
+
 2. Run `gbg_splitter.py` and follow the on-screen instructions.
 
 # Known graph braid groups

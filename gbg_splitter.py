@@ -198,7 +198,7 @@ class Graph:
         new_edges = []
         removed_edges = []
         for v in non_essential_vertices:
-            adjacent_edges = [edge for edge in self.edges if edge not in removed_edges and v in edge] + [edge for edge in new_edges]
+            adjacent_edges = [edge for edge in self.edges if edge not in removed_edges and v in edge] + [edge for edge in new_edges if v in edge]
             edge_1 = adjacent_edges[0]
             edge_2 = adjacent_edges[1]
             removed_edges.append(edge_1)
@@ -642,7 +642,7 @@ class GraphBraidGroup:
                 for free_factor in direct_factor_splittings[direct_factor]:
                     if type(free_factor) == str:
                         next_free_splitting.append(free_factor)
-                    elif len(free_factor.graph.vertices) != 1:
+                    elif len(free_factor.graph.edges) != 0:
                         next_free_splitting.append(free_factor)
                     elif not free_factor.vertex_groups[free_factor.graph.vertices[0]].is_trivial(): 
                         next_direct_splitting = []
@@ -836,7 +836,6 @@ def get_data_from_file(gbg_data):
                 raise ConfigFormatException
             elif int(entry) < 1 or int(entry) > len(adj_matrix):
                 raise ConfigFormatException
-        initial_config = [int(entry) - 1 for entry in config_data]
 
     return (num_particles, adj_matrix, initial_config)
 
@@ -887,7 +886,17 @@ def stringify_factors(splitting, braid_factor_counter, gog_factor_counter):
         elif type(factor) == GraphOfGroups:
             splitting[i] = f'G_{gog_factor_counter}'
             file = open('splitting.txt', 'a')
-            file.write(f'G_{gog_factor_counter} adjacency matrix: {factor.graph.adj_matrix} \n vertex groups: {factor.vertex_groups} \n edge groups: {factor.edge_groups} \n')
+            file.write(f'G_{gog_factor_counter} adjacency matrix: {factor.graph.adj_matrix} \n') 
+            for v in factor.vertex_groups:
+                if factor.vertex_groups[v].is_reduced():
+                    file.write(f'Vertex group {v+1}: B_{factor.vertex_groups[v].num_particles}, adjacency matrix: {factor.vertex_groups[v].graph.adj_matrix}, initial configuration: {[i+1 for i in factor.vertex_groups[v].initial_config]} \n')
+                else:
+                    file.write(f'Vertex group {v+1}: RB_{factor.vertex_groups[v].num_particles}, adjacency matrix: {factor.vertex_groups[v].graph.adj_matrix}, initial configuration: {[i+1 for i in factor.vertex_groups[v].initial_config]} \n')
+            for e in factor.edge_groups:
+                if factor.edge_groups[e].is_reduced():
+                    file.write(f'Edge group {(e[0]+1, e[1]+1)}: B_{factor.edge_groups[e].num_particles}, adjacency matrix: {factor.edge_groups[e].graph.adj_matrix}, initial configuration: {[i+1 for i in factor.edge_groups[e].initial_config]} \n')
+                else:
+                    file.write(f'Edge group {(e[0]+1, e[1]+1)}: RB_{factor.edge_groups[e].num_particles}, adjacency matrix: {factor.edge_groups[e].graph.adj_matrix}, initial configuration: {[i+1 for i in factor.edge_groups[e].initial_config]} \n')
             file.close()  
             gog_factor_counter += 1      
         elif type(factor) == list:

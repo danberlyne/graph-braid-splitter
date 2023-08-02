@@ -6,14 +6,25 @@ Given a graph braid group, this tool will search for a free splitting of the gro
 Please note: it has not yet been proven whether all free splittings of graph braid groups can be constructed via the methods in ['Graph of groups decompositions of graph braid groups'](https://arxiv.org/pdf/2209.03860.pdf). Thus, if this tool cannot find a free splitting, do not assume that one does not exist. Likewise, the factors in a splitting returned by this tool are freely indecomposable via the methods of ['Graph of groups decompositions of graph braid groups'](https://arxiv.org/pdf/2209.03860.pdf), but may turn out to be freely decomposable via some other method.
 
 # Instructions
-1. Enter the data for your graph braid group in the `gbg_data.txt` file. This includes:
+1. Enter the data for your graph braid group in the `gbg_data.txt` file. Detailed instructions are given in the file, but briefly, this should include:
 - the number of particles/strands;
 - the adjacency matrix for your graph;
 - an initial configuration of the particles, if required.
 
-Detailed instructions are given in the file.
-
 2. Run `gbg_splitter.py` and follow the on-screen instructions.
+
+# How to read output data in `splitting.txt`
+If a free splitting is found, the factors will be displayed in the terminal. Factors will either be: 
+- free groups, displayed in the form Z or F_k;
+- other known groups, displayed in the form given in `known_gbgs.txt`;
+- graph braid groups, displayed in the form B_n(Gamma_i) or RB_n(Gamma_i);
+- graphs of groups, displayed in the form G_i.
+
+Further information about the graphs Gamma_i and the graphs of groups G_i can be found in `splitting.txt`. 
+1. For Gamma_i, its adjacency matrix is given.
+2. For G_i, first the adjacency matrix of its graph is given. Then:
+- for each vertex (numbered according to its row in the adjacency matrix), the data of its associated graph braid group is given, including the type of braid group and number of particles (displayed in the form B_n or RB_n), the adjacency matrix, and the initial configuration;
+- for each edge (given as a 2-tuple of the row numbers of the vertices it connects), the data of its associated graph braid group is given.
 
 # Known graph braid groups
 Below is a list of known graph braid groups that are non-cyclic and directly and freely indecomposable, with citations in the literature. These are used to aid in computations. The author would appreciate any further contributions to this list. The data for these is included in `known_gbgs.txt` (note: in order to make these graphs canonical, any vertices of degree 2 must be removed before adding the data to this list).

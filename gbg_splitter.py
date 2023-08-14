@@ -967,98 +967,102 @@ def combine_strings(stringified_splitting, is_direct = True):
 # Main code #
 #############
 
-print('Checking gbg_data.txt...')
-file = open('gbg_data.txt')
-file_as_list = file.readlines()
-file.close()
-for i, line in enumerate(file_as_list):
-    file_as_list[i] = line.strip()
-non_empty_lines = [line for line in file_as_list if line != '']
-dotted_line = non_empty_lines.index('-' * 50)
-gbg_data = non_empty_lines[dotted_line + 1:]
+def main():
+    print('Checking gbg_data.txt...')
+    file = open('gbg_data.txt')
+    file_as_list = file.readlines()
+    file.close()
+    for i, line in enumerate(file_as_list):
+        file_as_list[i] = line.strip()
+    non_empty_lines = [line for line in file_as_list if line != '']
+    dotted_line = non_empty_lines.index('-' * 50)
+    gbg_data = non_empty_lines[dotted_line + 1:]
 
-# If data has not been entered in `gbg_data.txt`, prompt user to enter it manually.
-if len(gbg_data) == 3:
-    (num_particles, adj_matrix, initial_config) = enter_data_manually()
-# Otherwise, get data from `gbg_data.txt` and verify it is formatted correctly.
-else: 
-    (num_particles, adj_matrix, initial_config) = get_data_from_file(gbg_data)
+    # If data has not been entered in `gbg_data.txt`, prompt user to enter it manually.
+    if len(gbg_data) == 3:
+        (num_particles, adj_matrix, initial_config) = enter_data_manually()
+    # Otherwise, get data from `gbg_data.txt` and verify it is formatted correctly.
+    else: 
+        (num_particles, adj_matrix, initial_config) = get_data_from_file(gbg_data)
 
-gbg = GraphBraidGroup(Graph(adj_matrix), num_particles, initial_config)
-if not gbg.is_reduced():
-    print('WARNING: In order to perform computations for B_n(\Gamma), the graph \Gamma must satisfy the following conditions:')
-    print('1. All cycles must have length at least n+1.')
-    print('2. All paths between vertices of degree not equal to 2 must have length at least n-1.')
-    print('At least one of these conditions is not satisfied by your graph.')
-    print('If you choose to continue, any results obtained will only be true for the reduced braid group RB_n(\Gamma).')
-    print('Do you wish to continue? (y/n)')
-    while True:
-        response = input().lower()
-        if response == 'n':
-            while True:
-                exit_sequence = input('Please amend your data then run the script again. Press [Enter] to exit.')
-                if not exit_sequence:
-                    sys.exit()
-        elif response == 'y':
-            for comp in gbg.num_initial_particles_per_component:
-                if len(comp[0]) < gbg.num_initial_particles_per_component[comp]:
-                    raise VertexException
-            break
+    gbg = GraphBraidGroup(Graph(adj_matrix), num_particles, initial_config)
+    if not gbg.is_reduced():
+        print('WARNING: In order to perform computations for B_n(\Gamma), the graph \Gamma must satisfy the following conditions:')
+        print('1. All cycles must have length at least n+1.')
+        print('2. All paths between vertices of degree not equal to 2 must have length at least n-1.')
+        print('At least one of these conditions is not satisfied by your graph.')
+        print('If you choose to continue, any results obtained will only be true for the reduced braid group RB_n(\Gamma).')
+        print('Do you wish to continue? (y/n)')
+        while True:
+            response = input().lower()
+            if response == 'n':
+                while True:
+                    exit_sequence = input('Please amend your data then run the script again. Press [Enter] to exit.')
+                    if not exit_sequence:
+                        sys.exit()
+            elif response == 'y':
+                for comp in gbg.num_initial_particles_per_component:
+                    if len(comp[0]) < gbg.num_initial_particles_per_component[comp]:
+                        raise VertexException
+                break
 
-print('Verified successfully.')
-print('Searching for free splittings...')
+    print('Verified successfully.')
+    print('Searching for free splittings...')
 
-if gbg.is_trivial():
+    if gbg.is_trivial():
+        if gbg.is_reduced():
+            print(f'B_{num_particles} = 1')
+            start_exit_sequence()
+        else:
+            print(f'RB_{num_particles} = 1')
+            start_exit_sequence()
+
+    # Returns a nested list, where the odd levels of the list correspond to direct factors and the even levels correspond to free factors.
+    splitting = gbg.get_splitting()
+
+    print('Search complete.')
+
+    if len(splitting) == 1:
+        if type(splitting[0]) != str:
+            if type(splitting[0]) != list:
+                print('No splittings found.')
+                start_exit_sequence()
+            elif len(splitting[0]) == 1:
+                print('No splittings found.')
+                start_exit_sequence()
+
+    print('Splitting found. Converting data to readable format...')
+
+    # Makes a fresh copy of `splitting.txt`, the file containing detailed splitting information (for the graph of group factors and the graph braid group factors).
+    file = open('splitting.txt', 'w')
+    file.write('')
+    file.close()
+
+    # Turns all factors in the splitting into strings and adds detailed data to `splitting.txt` where appropriate.
+    stringify_factors(splitting, 1, 1)
+
+    combine_strings(splitting)
+    final_string = ' x '.join(splitting)
+
+    # Prints the splitting and adds it to the beginning of `splitting.txt`
+    with open('splitting.txt','r') as contents:
+        save = contents.read()
     if gbg.is_reduced():
-        print(f'B_{num_particles} = 1')
-        start_exit_sequence()
+        with open('splitting.txt','w') as contents:
+            contents.write(f'B_{num_particles} = ' + final_string + '\n\n')
+        with open('splitting.txt','a') as contents:
+            contents.write(save)
+        print(f'B_{num_particles} = ' + final_string)
     else:
-        print(f'RB_{num_particles} = 1')
-        start_exit_sequence()
+        with open('splitting.txt','w') as contents:
+            contents.write(f'RB_{num_particles} = ' + final_string + '\n\n')
+        with open('splitting.txt','a') as contents:
+            contents.write(save)
+        print(f'RB_{num_particles} = ' + final_string)
 
-# Returns a nested list, where the odd levels of the list correspond to direct factors and the even levels correspond to free factors.
-splitting = gbg.get_splitting()
+    if 'G_' in final_string or 'Gamma_' in final_string:
+        print('In the above splitting, Gamma_i are graphs and G_i are fundamental groups of graphs of groups. More detailed data can be found in splitting.txt.')
+    start_exit_sequence()
 
-print('Search complete.')
-
-if len(splitting) == 1:
-    if type(splitting[0]) != str:
-        if type(splitting[0]) != list:
-            print('No splittings found.')
-            start_exit_sequence()
-        elif len(splitting[0]) == 1:
-            print('No splittings found.')
-            start_exit_sequence()
-
-print('Splitting found. Converting data to readable format...')
-
-# Makes a fresh copy of `splitting.txt`, the file containing detailed splitting information (for the graph of group factors and the graph braid group factors).
-file = open('splitting.txt', 'w')
-file.write('')
-file.close()
-
-# Turns all factors in the splitting into strings and adds detailed data to `splitting.txt` where appropriate.
-stringify_factors(splitting, 1, 1)
-
-combine_strings(splitting)
-final_string = ' x '.join(splitting)
-
-# Prints the splitting and adds it to the beginning of `splitting.txt`
-with open('splitting.txt','r') as contents:
-    save = contents.read()
-if gbg.is_reduced():
-    with open('splitting.txt','w') as contents:
-        contents.write(f'B_{num_particles} = ' + final_string + '\n\n')
-    with open('splitting.txt','a') as contents:
-        contents.write(save)
-    print(f'B_{num_particles} = ' + final_string)
-else:
-    with open('splitting.txt','w') as contents:
-        contents.write(f'RB_{num_particles} = ' + final_string + '\n\n')
-    with open('splitting.txt','a') as contents:
-        contents.write(save)
-    print(f'RB_{num_particles} = ' + final_string)
-
-if 'G_' in final_string or 'Gamma_' in final_string:
-    print('In the above splitting, Gamma_i are graphs and G_i are fundamental groups of graphs of groups. More detailed data can be found in splitting.txt.')
-start_exit_sequence()
+if __name__ == '__main__':
+    main()

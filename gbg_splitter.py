@@ -68,7 +68,7 @@ class Graph:
         # Otherwise, start with the component containing first vertex of `subgraph`
         components = {self.get_component(subgraph[0][0], subgraph)[0]: self.get_component(subgraph[0][0], subgraph)[1]}
         for v in subgraph[0]:
-            if v not in [w for component in components for w in component[0]]:
+            if v not in {w for component in components for w in component[0]}:
                 components.update({self.get_component(v, subgraph)[0]: self.get_component(v, subgraph)[1]})
         return components
 
@@ -706,91 +706,92 @@ def enter_data_manually():
         print('No data detected in gbg_data.txt. Enter data manually? (y/n)')
         response = input().lower()
         if response == 'n':
-            while True:
-                exit_sequence = input('Please enter your data in gbg_data.txt then run the script again. Press [Enter] to exit.')
-                if not exit_sequence:
-                    sys.exit()
+            prompt_data_entry()
         elif response == 'y':
-            # Loop for manual entry of number of particles.
-            while True:
-                particle_response = input('Please enter the number of particles/strands in the graph braid group:\n')
-                if particle_response.isdecimal():
-                    if int(particle_response) > 0:
-                        num_particles = int(particle_response)
-                        break
-                    else:
-                        print('The number of particles must be a positive integer.')    
-                else:
-                    print('The number of particles must be a positive integer.')
-            # Loop for manual entry of adjacency matrix.
-            while True:
-                correct_formatting = True
-                matrix_response_1 = input('Please enter the first row of the adjacency matrix of the graph, with entries separated by single spaces:\n').split()
-                if matrix_response_1 == []:
-                    correct_formatting = False
-                    print('Incorrect formatting.')
-                    continue
-                for char in matrix_response_1:
-                    if not char.isdecimal():
-                        correct_formatting = False
-                        print('Incorrect formatting.')
-                        break
-                    elif int(char) < 0:
-                        correct_formatting = False
-                        print('Integers cannot be negative.')
-                        break
-                if correct_formatting:
-                    matrix_response = [matrix_response_1]
-                    for i in range(2, len(matrix_response_1) + 1):
-                        while True:
-                            correct_formatting = True
-                            current_matrix_response = input(f'Please enter row {i} of the adjacency matrix of the graph:\n').split()
-                            for char in current_matrix_response:
-                                if not char.isdecimal():
-                                    correct_formatting = False
-                                    print('Incorrect formatting.')
-                                    break
-                                elif int(char) < 0:
-                                    correct_formatting = False
-                                    print('Integers must be positive.')
-                                    break
-                            if len(current_matrix_response) != len(matrix_response_1):
-                                correct_formatting = False
-                                print('Incorrect formatting.')
-                            else:
-                                for j in range(i-1):
-                                    if current_matrix_response[j] != matrix_response[j][i-1]:
-                                        correct_formatting = False
-                                        print('Matrix must be symmetric.')
-                            if correct_formatting:
-                                matrix_response.append(current_matrix_response)
-                                break
-                    adj_matrix = [[int(entry) for entry in matrix_response[i]] for i in range(len(matrix_response_1))]
-                    break
-            # Loop for manual entry of initial configuration.
-            if Graph(adj_matrix).get_num_connected_components() == 1:
-                initial_config = None
+            num_particles = enter_particles()
+            adj_matrix = enter_matrix()
+            initial_config = enter_config(num_particles, adj_matrix)
+            return(num_particles, adj_matrix, initial_config)
+
+def prompt_data_entry():
+    while True:
+        exit_sequence = input('Please enter your data in gbg_data.txt then run the script again. Press [Enter] to exit.')
+        if not exit_sequence:
+            sys.exit()
+
+# Loop for manual entry of number of particles.
+def enter_particles():
+    while True:
+        particle_response = input('Please enter the number of particles/strands in the graph braid group:\n')
+        if particle_response.isdecimal():
+            if int(particle_response) > 0:
+                return int(particle_response)
             else:
+                print('The number of particles must be a positive integer.')    
+        else:
+            print('The number of particles must be a positive integer.')
+
+# Loop for manual entry of adjacency matrix.
+def enter_matrix():
+    while True:
+        matrix_response_1 = input('Please enter the first row of the adjacency matrix of the graph, with entries separated by single spaces:\n').split()
+        correct_formatting = verify_matrix_formatting(matrix_response_1, matrix_response_1)
+        if correct_formatting:
+            matrix_response = [matrix_response_1]
+            for i in range(2, len(matrix_response_1) + 1):
                 while True:
-                    correct_formatting = True
-                    config_response = input(f'Please enter the initial configuration of the {num_particles} particles on the vertices of the graph. Enter this data in the form of {num_particles} integers separated by single spaces, corresponding to the row numbers of the vertices in the adjacency matrix:\n').split()
-                    for char in config_response:
-                        if not char.isdecimal():
-                            correct_formatting = False
-                            print('Incorrect formatting.')
-                            break
-                        elif int(char) < 1 or int(char) > len(adj_matrix):
-                            correct_formatting = False
-                            print(f'Integers must be between 1 and {len(adj_matrix)}.')
-                            break
-                    if len(config_response) != num_particles:
-                        correct_formatting = False
-                        print('Number of integers must match number of particles.')
+                    current_matrix_response = input(f'Please enter row {i} of the adjacency matrix of the graph:\n').split()
+                    correct_formatting = verify_matrix_formatting(matrix_response_1, current_matrix_response)
                     if correct_formatting:
-                        initial_config = [int(entry) - 1 for entry in config_response]
-                        break
-            break
-    return(num_particles, adj_matrix, initial_config)
+                        is_symmetric = verify_symmetric(matrix_response, current_matrix_response, i)
+                        if is_symmetric:
+                            matrix_response.append(current_matrix_response)
+                            break
+            return [[int(entry) for entry in matrix_response[i]] for i in range(len(matrix_response_1))]
+        
+def verify_matrix_formatting(initial_matrix_response, current_matrix_response):
+    if len(initial_matrix_response) == 0 or len(current_matrix_response) != len(initial_matrix_response):
+        print('Incorrect formatting.')
+        return False
+    for char in current_matrix_response:
+        if not char.isdecimal():
+            print('Incorrect formatting.')
+            return False
+        elif int(char) < 0:
+            print('Integers cannot be negative.')
+            return False
+    return True
+
+def verify_symmetric(matrix_response, current_matrix_response, row_num):
+    for j in range(row_num - 1):
+        if current_matrix_response[j] != matrix_response[j][row_num - 1]:
+            print('Matrix must be symmetric.')
+            return False
+    return True
+        
+# Loop for manual entry of initial configuration.
+def enter_config(num_particles, adj_matrix):
+    if Graph(adj_matrix).get_num_connected_components() == 1:
+        return None
+    else:
+        while True:
+            config_response = input(f'Please enter the initial configuration of the {num_particles} particles on the vertices of the graph. Enter this data in the form of {num_particles} integers separated by single spaces, corresponding to the row numbers of the vertices in the adjacency matrix:\n').split()
+            correct_formatting = verify_config_formatting(config_response, num_particles, adj_matrix)
+            if correct_formatting:
+                return [int(entry) - 1 for entry in config_response]
+            
+def verify_config_formatting(config_response, num_particles, adj_matrix):
+    if len(config_response) != num_particles:
+        print('Number of integers must match number of particles.')
+        return False
+    for char in config_response:
+        if not char.isdecimal():
+            print('Incorrect formatting.')
+            return False
+        elif int(char) < 1 or int(char) > len(adj_matrix):
+            print(f'Integers must be between 1 and {len(adj_matrix)}.')
+            return False
+    return True
 
 # Takes as input a list of strings corresponding from the lines of `gbg_data.txt` below the dotted line in the file. 
 # Returns the number of particles, adjacency matrix of the graph, and the initial configuration in the correct format.
@@ -987,12 +988,12 @@ def main():
 
     gbg = GraphBraidGroup(Graph(adj_matrix), num_particles, initial_config)
     if not gbg.is_reduced():
-        print('WARNING: In order to perform computations for B_n(\Gamma), the graph \Gamma must satisfy the following conditions:')
-        print('1. All cycles must have length at least n+1.')
-        print('2. All paths between vertices of degree not equal to 2 must have length at least n-1.')
-        print('At least one of these conditions is not satisfied by your graph.')
-        print('If you choose to continue, any results obtained will only be true for the reduced braid group RB_n(\Gamma).')
-        print('Do you wish to continue? (y/n)')
+        print('''WARNING: In order to perform computations for B_n(\Gamma), the graph \Gamma must satisfy the following conditions:
+1. All cycles must have length at least n+1.
+2. All paths between vertices of degree not equal to 2 must have length at least n-1.
+At least one of these conditions is not satisfied by your graph.
+If you choose to continue, any results obtained will only be true for the reduced braid group RB_n(\Gamma).
+Do you wish to continue? (y/n)''')
         while True:
             response = input().lower()
             if response == 'n':
@@ -1006,8 +1007,7 @@ def main():
                         raise VertexException
                 break
 
-    print('Verified successfully.')
-    print('Searching for free splittings...')
+    print('Verified successfully.\nSearching for free splittings...')
 
     if gbg.is_trivial():
         if gbg.is_reduced():

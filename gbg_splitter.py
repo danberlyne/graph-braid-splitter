@@ -5,8 +5,9 @@ import math, copy, sys, ast, itertools
 from collections import defaultdict
 
 MatrixDimensionException = Exception('Adjacency matrix must be square.')
-MatrixFormatException = Exception('Adjacency matrix must only contain positive integers and spaces.')
+MatrixFormatException = Exception('Adjacency matrix must either only contain positive integers and spaces or use the list of lists format.')
 MatrixSymmetryException = Exception('Adjacency matrix must be symmetric.')
+GraphFormatException = Exception('Graph cannot contain loops or multi-edges.')
 ParticleFormatException = Exception('Number of particles must be a positive integer.')
 ConfigDimensionException = Exception('Number of integers in initial configuration must equal number of particles.')
 ConfigFormatException = Exception('Initial configuration must only contain spaces and integers between 1 and the number of rows in the adjacency matrix.')
@@ -760,9 +761,15 @@ def verify_matrix_formatting(initial_matrix_response, current_matrix_response):
         elif int(char) < 0:
             print('Integers cannot be negative.')
             return False
+        elif int(char > 1):
+            print('Graph cannot contain multi-edges.')
+            return False
     return True
 
 def verify_symmetric(matrix_response, current_matrix_response, row_num):
+    if current_matrix_response[row_num - 1] != 0:
+        print('Graph cannot contain loops.')
+        return False
     for j in range(row_num - 1):
         if current_matrix_response[j] != matrix_response[j][row_num - 1]:
             print('Matrix must be symmetric.')
@@ -796,15 +803,49 @@ def verify_config_formatting(config_response, num_particles, adj_matrix):
 # Takes as input a list of strings corresponding from the lines of `gbg_data.txt` below the dotted line in the file. 
 # Returns the number of particles, adjacency matrix of the graph, and the initial configuration in the correct format.
 def get_data_from_file(gbg_data):
+    num_particles = convert_particle_data(gbg_data)
+    if is_list_format(gbg_data):
+        adj_matrix = convert_matrix_data_list(gbg_data)
+    else:
+        adj_matrix = convert_matrix_data_lines(gbg_data)
+    initial_config = convert_config_data(gbg_data, num_particles, adj_matrix)
+    return (num_particles, adj_matrix, initial_config)
+
+def convert_particle_data(gbg_data):
     particle_data = gbg_data[0].lstrip('Number of particles:').strip()
     if particle_data.isdecimal():
         if int(particle_data) > 0:
-            num_particles = int(particle_data)
+            return int(particle_data)
         else:
             raise ParticleFormatException
     else: 
         raise ParticleFormatException
 
+def is_list_format(gbg_data):
+    if gbg_data[2].replace(' ', '')[:2] == '[[':
+        return True
+    else:
+        return False
+
+def convert_matrix_data_list(gbg_data):
+    # Convert data into a list of rows of the matrix, with each row in the form of a string of integers separated by commas.
+    rows = gbg_data[2].replace(' ', '').lstrip('[[').rstrip(']]').split('],[')
+    string_matrix = [rows[i].split(',') for i in range(len(rows))]
+    for i in range(len(string_matrix)):
+        for entry in string_matrix[i]:
+            if not entry.isdecimal():
+                raise MatrixFormatException
+            elif int(entry) < 0:
+                raise MatrixFormatException
+        if len(string_matrix[i]) != len(string_matrix):
+            raise MatrixDimensionException
+    for i in range(len(string_matrix)):
+        for j in range(i+1):
+            if string_matrix[i][j] != string_matrix[j][i]:
+                raise MatrixSymmetryException
+    return [[int(string_matrix[i][j]) for j in range(len(string_matrix))] for i in range(len(string_matrix))]
+
+def convert_matrix_data_lines(gbg_data):
     matrix_size = len(gbg_data[2].split())
     for i in range(matrix_size):
         if len(gbg_data[2 + i]) >= 21:
@@ -822,11 +863,16 @@ def get_data_from_file(gbg_data):
         for j in range(i+1):
             if adj_matrix[i][j] != adj_matrix[j][i]:
                 raise MatrixSymmetryException
+    return adj_matrix
 
-    config_data = gbg_data[2 + matrix_size].lstrip('Initial configuration:').split()
+def convert_config_data(gbg_data, num_particles, adj_matrix):
+    if is_list_format(gbg_data):
+        config_data = gbg_data[3].lstrip('Initial configuration:').split()
+    else:
+        config_data = gbg_data[2 + len(adj_matrix)].lstrip('Initial configuration:').split()
     if config_data == []:
         if Graph(adj_matrix).get_num_connected_components() == 1:
-            initial_config = None
+            return None
         else:
             raise ConfigDimensionException
     elif len(config_data) != num_particles:
@@ -837,8 +883,7 @@ def get_data_from_file(gbg_data):
                 raise ConfigFormatException
             elif int(entry) < 1 or int(entry) > len(adj_matrix):
                 raise ConfigFormatException
-
-    return (num_particles, adj_matrix, initial_config)
+    return [int(entry) - 1 for entry in config_data]
 
 # Replaces all factors in a splitting with string versions and adds detailed data to `splitting.txt` where appropriate.
 def stringify_factors(splitting, braid_factor_counter, gog_factor_counter):

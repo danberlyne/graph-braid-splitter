@@ -10,6 +10,10 @@ Please note: it has not yet been proven whether all free splittings of graph bra
 - the number of particles/strands;
 - the adjacency matrix for your graph;
 - an initial configuration of the particles, if required.
+Note that [this handy online graph calculator](https://www.mas.ncl.ac.uk/graph-curvature/)[^1] can easily produce an adjacency matrix from a hand-drawn graph, which can then be copy-pasted into `gbg_data.txt`.
+
+[^1]: *The Graph Curvature Calculator and the curvatures of cubic graphs, Experimental Mathematics, 2019
+(arXiv:1712.03033 [math.CO])*
 
 2. Run `gbg_splitter.py` and follow the on-screen instructions.
 

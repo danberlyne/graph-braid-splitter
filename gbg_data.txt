@@ -5,13 +5,19 @@ Instructions for entering your graph braid group data:
 2. Enter the number of particles/strands in your braid group.
 
 3. Enter the adjacency matrix of your graph, following the guidelines below:
-- Enter each row of the matrix on a new line.
-- Separate each column with a single space.
-- Make sure your graph does not contain any loops or multi-edges.
+- First, make sure your graph does not contain any loops or multi-edges.
 - Additionally, if your graph braid group has n particles:
 -- Make sure all cycles in your graph have length at least n+1.
 -- Make sure all paths between vertices of degree not equal to 1 have length at least n-1.
-(Not doing the last two steps will produce computations for RB_n(\Gamma) instead of B_n(\Gamma).)
+(Not doing the above two steps will produce computations for RB_n(\Gamma) instead of B_n(\Gamma).)
+- Now, EITHER:
+-- Enter each row of the matrix on a new line.
+-- Separate each column with a single space.
+- OR: 
+-- Write the matrix on a single line, enclosing it with square brackets and separating rows with commas.
+-- Enclose each row with square brackets and separate the row's entries with commas.
+(Tip: You can hand-draw your graph [here](https://www.mas.ncl.ac.uk/graph-curvature/) to easily get an adjacency matrix of the second form.
+The adjacency matrix can be found in the bottom-left corner of the webpage.)
 
 4. Enter an initial configuration for your particles, following the guidelines below:
 - Enter the row numbers (in the adjacency matrix) of the vertices of the graph that your particles start at.
@@ -19,7 +25,7 @@ Instructions for entering your graph braid group data:
 - Row numbering begins at 1.
 - If your graph is connected, this can be left blank.
 
-Example:
+Example 1:
 
 Number of particles: 3
 Adjacency matrix:
@@ -36,6 +42,14 @@ Adjacency matrix:
 0 0 0 0 0 0 0 0 0 0 0 1
 0 0 0 0 0 0 0 0 0 1 1 0
 Initial configuration: 2 4 12
+
+Example 2:
+
+Number of particles: 3
+Adjacency matrix:
+[[0,1,1,0,0,0,0,0,0,0,0,0],[1,0,0,1,0,0,0,0,0,0,0,0],[1,0,0,1,1,0,0,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0,0,0,0,0],[0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0],[0,0,0,0,0,0,1,0,0,1,0,0],[0,0,0,0,0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,1,1,0]]
+Initial configuration: 2 4 12
+
 
 Please enter your data below the dotted line.
 --------------------------------------------------

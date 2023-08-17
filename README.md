@@ -6,11 +6,10 @@ Given a graph braid group, this tool will search for a free splitting of the gro
 Please note: it has not yet been proven whether all free splittings of graph braid groups can be constructed via the methods in ['Graph of groups decompositions of graph braid groups'](https://arxiv.org/pdf/2209.03860.pdf). Thus, if this tool cannot find a free splitting, do not assume that one does not exist. Likewise, the factors in a splitting returned by this tool are freely indecomposable via the methods of ['Graph of groups decompositions of graph braid groups'](https://arxiv.org/pdf/2209.03860.pdf), but may turn out to be freely decomposable via some other method.
 
 # Instructions
-1. Enter the data for your graph braid group in the `gbg_data.txt` file. Detailed instructions are given in the file, but briefly, this should include:
-- the number of particles/strands;
-- the adjacency matrix for your graph;
-- an initial configuration of the particles, if required.
-Note that [this handy online graph calculator](https://www.mas.ncl.ac.uk/graph-curvature/)[^1] can easily produce an adjacency matrix from a hand-drawn graph, which can then be copy-pasted into `gbg_data.txt`.
+1. Enter the data for your graph braid group in the `gbg_data.txt` file. Detailed instructions are given in the file, but briefly, this should include the following.
+- The number of particles/strands.
+- The adjacency matrix for your graph. Note that [this handy online graph calculator](https://www.mas.ncl.ac.uk/graph-curvature/)[^1] can easily produce an adjacency matrix from a hand-drawn graph, which can then be copy-pasted into `gbg_data.txt`.
+- An initial configuration of the particles, if required.
 
 [^1]: *The Graph Curvature Calculator and the curvatures of cubic graphs, Experimental Mathematics, 2019
 (arXiv:1712.03033 [math.CO])*

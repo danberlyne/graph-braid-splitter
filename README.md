@@ -14,7 +14,7 @@ Please note: it has not yet been proven whether all free splittings of graph bra
 [^1]: *The Graph Curvature Calculator and the curvatures of cubic graphs, Experimental Mathematics, 2019
 (arXiv:1712.03033 [math.CO])*
 
-2. Run `gbg_splitter.py` and follow the on-screen instructions.
+2. Run `splitter.py` and follow the on-screen instructions.
 
 # How to read output data in `splitting.txt`
 If a free splitting is found, the factors will be displayed in the terminal. Factors will either be: 
@@ -28,6 +28,8 @@ Further information about the graphs Gamma_i and the graphs of groups G_i can be
 2. For G_i, first the adjacency matrix of its graph is given. Then:
 - for each vertex (numbered according to its row in the adjacency matrix), the data of its associated graph braid group is given, including the type of braid group and number of particles (displayed in the form B_n or RB_n), the adjacency matrix, and the initial configuration;
 - for each edge (given as a 2-tuple of the row numbers of the vertices it connects), the data of its associated graph braid group is given.
+
+Tip: Click 'load' in the bottom-right corner of [this handy online graph calculator](https://www.mas.ncl.ac.uk/graph-curvature/)[^1] and paste the adjacency matrix to quickly obtain a picture of the graph.
 
 # Known graph braid groups
 Below is a list of known graph braid groups that are non-cyclic and directly and freely indecomposable, with citations in the literature. These are used to aid in computations. The author would appreciate any further contributions to this list. The data for these is included in `known_gbgs.txt` (note: in order to make these graphs canonical, any vertices of degree 2 must be removed before adding the data to this list).

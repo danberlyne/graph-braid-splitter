@@ -323,7 +323,7 @@ class GraphBraidGroup:
                     direct_factor_splittings[direct_factor] = splitting
                     break
             # Otherwise, choose any other non-trivial splitting.
-            if isinstance(direct_factor_splittings[direct_factor][0], str):
+            if not isinstance(direct_factor_splittings[direct_factor][0], str):
                 for splitting in splittings:
                     if len(splitting) > 1:
                         direct_factor_splittings[direct_factor] = splitting

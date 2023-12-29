@@ -23,7 +23,7 @@ class Graph:
     # the keys are 2-tuples of vertex sets and edge sets of the connected components of the graph, considered as subgraphs;
     # the values are the components as standalone 'Graph' objects.
     def get_connected_components(self, subgraph = None):
-        if subgraph == None:
+        if subgraph is None:
             subgraph = (self.vertices, self.edges)
         # The empty subgraph has no connected components.
         if subgraph[0] == []:
@@ -39,7 +39,7 @@ class Graph:
     # (`subgraph` defaults to the original graph) and the second entry is the connected component as a standalone Graph object.
     # Note, `subgraph` should be a (vertex set, edge set) 2-tuple of sublists of `self.vertices` and `self.edges`
     def get_component(self, vertex, subgraph = None):
-        if subgraph == None:
+        if subgraph is None:
             subgraph = (self.vertices, self.edges)
         component_vertices = [vertex]
         component_edges = []
@@ -59,7 +59,7 @@ class Graph:
         return ((tuple(component_vertices), tuple(component_edges)), Graph(component_adj_matrix))
     
     def iterate_component(self, component_vertices, component_edges, current_vertex, subgraph = None):
-        if subgraph == None:
+        if subgraph is None:
             subgraph = (self.vertices, self.edges)
         for edge in subgraph[1]:
             if current_vertex in edge and edge not in component_edges:
@@ -95,7 +95,7 @@ class Graph:
         subgraph_vertices = [v for v in self.vertices if v not in (i, j)]
         subgraph_edges = [e for e in self.edges if i not in e and j not in e]
         # Removing edge (i, j) corresponds to removing the ith and jth rows and columns from the adjacency matrix
-        adj_matrix_minus_closed_edge = [[self.adj_matrix[k][l] for l in range(len(self.adj_matrix[k])) if l not in (i, j)] for k in range(len(self.adj_matrix)) if k not in (i, j)]
+        adj_matrix_minus_closed_edge = [[self.adj_matrix[k][m] for m in range(len(self.adj_matrix[k])) if m not in (i, j)] for k in range(len(self.adj_matrix)) if k not in (i, j)]
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_closed_edge))
     
     # We remove a single vertex from our graph, together with all edges containing the vertex.
@@ -103,7 +103,7 @@ class Graph:
         subgraph_vertices = [v for v in self.vertices if v != removed_vertex]
         subgraph_edges = [e for e in self.edges if removed_vertex not in e]
         # Removing the vertex corresponds to removing its row and column from the adjacency matrix
-        adj_matrix_minus_vertex = [[self.adj_matrix[k][l] for l in range(len(self.adj_matrix[k])) if l != removed_vertex] for k in range(len(self.adj_matrix)) if k != removed_vertex]
+        adj_matrix_minus_vertex = [[self.adj_matrix[k][m] for m in range(len(self.adj_matrix[k])) if m != removed_vertex] for k in range(len(self.adj_matrix)) if k != removed_vertex]
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_vertex))
 
     # Goes through the list `edges` one by one and checks if the edge is non-separating. If so, removes that (open) edge and repeats on the new graph.

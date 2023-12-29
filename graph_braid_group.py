@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # graph_braid_group.py - GraphBraidGroup class file.
 
-import math, itertools
+import math
+import itertools
 from collections import defaultdict
 from graph import Graph
 from graph_of_groups import GraphOfGroups
@@ -38,7 +39,7 @@ class GraphBraidGroup:
         # `initial_config` should be a list of vertices of `graph` of length `num_particles`.
         # The initial configuration serves as a base point in case the configuration space is not connected.
         # If the config space is connected, `initial_config` can be left blank and defaults to the first `num_particles` vertices of the graph.
-        if initial_config == None:
+        if initial_config is None:
             self.initial_config = [self.graph.vertices[i] for i in range(num_particles)]
         else:
             self.initial_config = initial_config
@@ -318,11 +319,11 @@ class GraphBraidGroup:
             splittings = [direct_factor.get_graph_of_groups([edge]).get_free_splitting() for edge in direct_factor.graph.edges]
             # If there is a splitting that gives a free group, choose this.
             for splitting in splittings:
-                if len(splitting) == 1 and type(splitting[0]) == str:
+                if len(splitting) == 1 and isinstance(splitting[0], str):
                     direct_factor_splittings[direct_factor] = splitting
                     break
             # Otherwise, choose any other non-trivial splitting.
-            if type(direct_factor_splittings[direct_factor][0]) != str:
+            if isinstance(direct_factor_splittings[direct_factor][0], str):
                 for splitting in splittings:
                     if len(splitting) > 1:
                         direct_factor_splittings[direct_factor] = splitting
@@ -337,7 +338,7 @@ class GraphBraidGroup:
             else:
                 next_free_splitting = []
                 for free_factor in direct_factor_splittings[direct_factor]:
-                    if type(free_factor) == str:
+                    if isinstance(free_factor, str):
                         next_free_splitting.append(free_factor)
                     elif len(free_factor.graph.edges) != 0:
                         next_free_splitting.append(free_factor)
@@ -375,7 +376,7 @@ class GraphBraidGroup:
                     elif is_same(factor_1.graph.adj_matrix, factor_2.graph.adj_matrix):
                         has_same_factor = True
                         break
-            if has_same_factor == False:
+            if not has_same_factor:
                 return False
         has_same_factor = False
         for factor_2 in non_trivial_factors_2:
@@ -388,6 +389,6 @@ class GraphBraidGroup:
                     elif is_same(factor_2.graph.adj_matrix, factor_1.graph.adj_matrix):
                         has_same_factor = True
                         break
-            if has_same_factor == False:
+            if not has_same_factor:
                 return False
         return True

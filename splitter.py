@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # splitter.py - Detects free splittings of graph braid groups
 
-import sys, ast, itertools
+import sys
+import ast
+import itertools
 from collections import defaultdict
 from graph import Graph
 from graph_of_groups import GraphOfGroups
@@ -210,7 +212,7 @@ def convert_config_data(gbg_data, num_particles, adj_matrix):
 def stringify_factors(splitting, braid_factor_counter, gog_factor_counter):
     known_gbgs = get_known_gbgs_from_file()
     for i, factor in enumerate(splitting):
-        if type(factor) == GraphBraidGroup:
+        if isinstance(factor, GraphBraidGroup):
             if factor.is_reduced():
                 essential_graph = factor.graph.make_essential()
                 essential_adj_matrix_hashable = tuple(tuple(row) for row in essential_graph.adj_matrix)
@@ -250,7 +252,7 @@ def stringify_factors(splitting, braid_factor_counter, gog_factor_counter):
                     file.write(f'Gamma_{braid_factor_counter} adjacency matrix: {factor.adj_matrix} \n')
                     file.close()
                     braid_factor_counter += 1
-        elif type(factor) == GraphOfGroups:
+        elif isinstance(factor, GraphOfGroups):
             splitting[i] = f'G_{gog_factor_counter}'
             file = open('splitting.txt', 'a')
             file.write(f'G_{gog_factor_counter} adjacency matrix: {factor.graph.adj_matrix} \n') 
@@ -266,7 +268,7 @@ def stringify_factors(splitting, braid_factor_counter, gog_factor_counter):
                     file.write(f'Edge group {(e[0]+1, e[1]+1)}: RB_{factor.edge_groups[e].num_particles}, adjacency matrix: {factor.edge_groups[e].graph.adj_matrix}, initial configuration: {[i+1 for i in factor.edge_groups[e].initial_config]} \n')
             file.close()  
             gog_factor_counter += 1      
-        elif type(factor) == list:
+        elif isinstance(factor, list):
             stringify_factors(factor, braid_factor_counter, gog_factor_counter)
 
 # Gets list of known graph braid groups from `known_gbgs.txt` and puts them in a dictionary.
@@ -298,10 +300,10 @@ def is_same(adj_matrix_1, adj_matrix_2):
 def combine_strings(stringified_splitting, is_direct = True):
     for i, factor in enumerate(stringified_splitting):
         # If a factor is a list of non-lists, then replace the factor in `stringified_splitting` with its string representation.
-        if type(factor) == list:
+        if isinstance(factor, list):
             for subfactor in factor:
                 # If we find a list in factor's subfactors, then feed factor back into `combine_strings`.
-                if type(subfactor) == list:
+                if isinstance(subfactor, list):
                     combine_strings(factor, not is_direct)
                     break
             # If `stringified splitting` is a direct splitting, then `factor` is a free splitting.
@@ -390,11 +392,11 @@ Do you wish to continue? (y/n)''')
 
     # length == 1 means it does not split as a direct product.
     if len(splitting) == 1:
-        if type(splitting[0]) != str:
-            if type(splitting[0]) != list:
+        if not isinstance(splitting[0], str):
+            if not isinstance(splitting[0], list):
                 print('No splittings found.')
                 start_exit_sequence()
-            elif len(splitting[0]) == 1 and type(splitting[0][0]) != str:
+            elif len(splitting[0]) == 1 and not isinstance(splitting[0][0], str):
                 print('No splittings found.')
                 start_exit_sequence()
 

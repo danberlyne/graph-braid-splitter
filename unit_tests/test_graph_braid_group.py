@@ -1,6 +1,17 @@
 from graph_braid_group import integer_partitions, is_same, GraphBraidGroup
 from graph import Graph
 
+# TO DO: Create a class for each type of graph to be used in testing:
+# - Single vertex, 1 particle
+# - Segment of length 4, 3 particles
+# - Three segments of length 2, two particles
+# - 3-prong star graph and single vertex, (2,1) particles
+# - Two 3-prong star graphs, one subdivided, (3,3) particles
+# - K_5 subdivided, 2 particles
+# - Delta graph, 2 particles
+# - 100-prong star graph, 10 particles
+# - 100 cycles each of length 100, 100 particles
+
 def test_integer_partitions():
     assert True
 

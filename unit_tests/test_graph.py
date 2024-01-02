@@ -8,7 +8,7 @@ class TestGraphVertex:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(self.test_graph.vertices, self.test_graph.edges) : self.test_graph}
+        assert self.test_graph.get_connected_components() == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)) : self.test_graph}
     def test_get_component(self):
         assert self.test_graph.get_component(0) == ((tuple(self.test_graph.vertices), tuple(self.test_graph.edges)), self.test_graph)
     def test_get_num_connected_components(self):
@@ -27,7 +27,7 @@ class TestGraphEdge:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(self.test_graph.vertices, self.test_graph.edges) : self.test_graph}
+        assert self.test_graph.get_connected_components() == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)) : self.test_graph}
     def test_get_component(self):
         assert self.test_graph.get_component(0) == ((tuple(self.test_graph.vertices), tuple(self.test_graph.edges)), self.test_graph)
     def test_get_num_connected_components(self):
@@ -54,7 +54,7 @@ class TestGraphLoop:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(self.test_graph.vertices, self.test_graph.edges) : self.test_graph}
+        assert self.test_graph.get_connected_components() == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)) : self.test_graph}
     def test_get_component(self):
         assert self.test_graph.get_component(0) == ((tuple(self.test_graph.vertices), tuple(self.test_graph.edges)), self.test_graph)
     def test_get_num_connected_components(self):
@@ -82,7 +82,7 @@ class TestGraphSegment:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(self.test_graph.vertices, self.test_graph.edges) : self.test_graph}
+        assert self.test_graph.get_connected_components() == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)) : self.test_graph}
     def test_get_component(self):
         assert self.test_graph.get_component(0) == ((tuple(self.test_graph.vertices), tuple(self.test_graph.edges)), self.test_graph)
     def test_get_num_connected_components(self):
@@ -110,7 +110,7 @@ class TestGraph3Vertex:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {([0], []) : Graph([[0]]), ([1], []) : Graph([[0]]), ([2], []) : Graph([[0]])}
+        assert self.test_graph.get_connected_components() == {((0,), tuple()) : Graph([[0]]), ((1,), tuple()) : Graph([[0]]), ((2,), tuple()) : Graph([[0]])}
     def test_get_component(self):
         assert self.test_graph.get_component(0) == (((0,), tuple()), Graph([[0]]))
     def test_get_num_connected_components(self):
@@ -130,7 +130,7 @@ class TestGraph3Segment:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {([0,1], [(0,1)]) : Graph([[0,1],[1,0]]), ([2,3,4], [(2,3),(3,4)]) : Graph([[0,1,0],[1,0,1],[0,1,0]]), ([5,6,7,8], [(5,6),(6,7),(7,8)]) : Graph([[0,1,0,0],[1,0,1,0],[0,1,0,1],[0,0,1,0]])}
+        assert self.test_graph.get_connected_components() == {((0,1), ((0,1),)) : Graph([[0,1],[1,0]]), ((2,3,4), ((2,3),(3,4))) : Graph([[0,1,0],[1,0,1],[0,1,0]]), ((5,6,7,8), ((5,6),(6,7),(7,8))) : Graph([[0,1,0,0],[1,0,1,0],[0,1,0,1],[0,0,1,0]])}
     def test_get_component(self):
         assert self.test_graph.get_component(2) == (((2,3,4), ((2,3),(3,4))), Graph([[0,1,0],[1,0,1],[0,1,0]]))
     def test_get_num_connected_components(self):
@@ -158,7 +158,7 @@ class TestGraphStar:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(self.test_graph.vertices, self.test_graph.edges) : self.test_graph}
+        assert self.test_graph.get_connected_components() == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)) : self.test_graph}
     def test_get_component(self):
         assert self.test_graph.get_component(2) == ((tuple(self.test_graph.vertices), tuple(self.test_graph.edges)), self.test_graph)
     def test_get_num_connected_components(self):
@@ -185,7 +185,7 @@ class TestGraphTheta4:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(self.test_graph.vertices, self.test_graph.edges) : self.test_graph}
+        assert self.test_graph.get_connected_components() == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)) : self.test_graph}
     def test_get_component(self):
         assert self.test_graph.get_component(0) == ((tuple(self.test_graph.vertices), tuple(self.test_graph.edges)), self.test_graph)
     def test_get_num_connected_components(self):
@@ -212,7 +212,7 @@ class TestGraphK100:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(self.test_graph.vertices, self.test_graph.edges) : self.test_graph}
+        assert self.test_graph.get_connected_components() == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)) : self.test_graph}
     def test_get_component(self):
         assert self.test_graph.get_component(99) == ((tuple(self.test_graph.vertices), tuple(self.test_graph.edges)), self.test_graph)
     def test_get_num_connected_components(self):
@@ -239,11 +239,11 @@ class TestGraph100Cycles:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {([100*k + i for i in range(100)], [(100*k + i, 100*k + i+1) for i in range(99)] + [(100*k, 100*k + 99)]) : 
+        assert self.test_graph.get_connected_components() == {(tuple([100*k + i for i in range(100)]), tuple([(100*k + i, 100*k + i+1) for i in range(99)] + [(100*k, 100*k + 99)])) : 
                                                               Graph([[1 if (i == (j+1) % 100 or j == (i+1) % 100) else 0 for i in range(100)] for j in range(100)]) 
                                                               for k in range(100)}
     def test_get_component(self):
-        assert self.test_graph.get_component(0) == ((tuple([i for i in range(100)]), tuple([(i, i+1) for i in range(99)] + [(0, 99)])), 
+        assert self.test_graph.get_component(0) == ((tuple([i for i in range(100)]), tuple([(0, 1)] + [(0, 99)] + [(i, i+1) for i in range(1, 99)])), 
                                                     Graph([[1 if (i == (j+1) % 100 or j == (i+1) % 100) else 0 for i in range(100)] for j in range(100)]))
     def test_get_num_connected_components(self):
         assert self.test_graph.get_num_connected_components() == 100
@@ -254,22 +254,21 @@ class TestGraph100Cycles:
         for k in range(1, 100):
             edges += [(100*k + i, 100*k + i+1) for i in range(99)] + [(100*k, 100*k + 99)]
         assert self.test_graph.get_graph_minus_closed_edge((98,99)) == (([i for i in range(100*100) if i not in [98,99]], edges), 
-                                                                        Graph([[1 if (i == j+1 or j == i+1) and j < 98 else 0 for i in range(98)] + [1 if (i % 100 == (j+1) % 100 or j % 100 == (i+1) % 100) and i // 100 == j // 100 else 0 for i in range(98, 100*100 - 2)] for j in range(98, 100*100 - 2)]))
+                                                                        Graph([[1 if (i == j+1 or j == i+1) and (j < 97 or i < 97) else 0 for i in range(98)] + [1 if (i % 100 == (j+1) % 100 or j % 100 == (i+1) % 100) and (i-98) // 100 == (j-98) // 100 else 0 for i in range(98, 100*100 - 2)] for j in range(100*100 - 2)]))
     def test_get_graph_minus_vertex(self):
-        assert self.test_graph.get_graph_minus_vertex(99) == (([i for i in range(100*100) if i != 99], 
-                                                               [(100*k + i, 100*k + ((i+1) % 100)) for i in range(100) for k in range(100) if 100*k + i != 98]), 
-                                                               Graph([[1 if i != j else 0 for i in range(99)] for j in range(99)]))
+        edges = [(i, i+1) for i in range(98)]
+        for k in range(1, 100):
+            edges += [(100*k + i, 100*k + i+1) for i in range(99)] + [(100*k, 100*k + 99)]
+        assert self.test_graph.get_graph_minus_vertex(99) == (([i for i in range(100*100) if i != 99], edges), 
+                                                              Graph([[1 if (i == j+1 or j == i+1) and (j < 98 or i < 98) else 0 for i in range(99)] + [1 if (i % 100 == (j+1) % 100 or j % 100 == (i+1) % 100) and (i-99) // 100 == (j-99) // 100 else 0 for i in range(99, 100*100 - 1)] for j in range(100*100 - 1)]))
     def test_prune(self):
-        assert self.test_graph.prune([(i,99) for i in range(99)]) == (Graph([[1 if (i == 98 and j == 99) or (i != j and i != 99 and j != 99) else 0 for i in range(100)] for j in range(100)]), [(i,99) for i in range(98)])
+        assert self.test_graph.prune([(100*k, 100*k + 99) for k in range(100)]) == (Graph([[1 if (i == j+1 or j == i+1) and (j % 100 not in [99,0] or i % 100 not in [99,0]) else 0 for i in range(100*100)] for j in range(100*100)]), 
+                                                                                    [(100*k, 100*k + 99) for k in range(100)])
     def test_is_separating(self):
-        assert not self.test_graph.is_separating((9900, 9901))
+        assert not self.test_graph.is_separating((9905,9906))
     def test_get_degree(self):
         assert self.test_graph.get_degree(9990) == 2
     def test_get_centreless_ball(self):
-        ball = []
-        for i in range(1, 49):
-            ball += [i, 100-i]
-        ball += [50, 0]
-        assert self.test_graph.get_centreless_ball(0, 100) == ball
+        assert self.test_graph.get_centreless_ball(0, 100) == [i for i in range(1, 100)] + [0]
     def test_make_essential(self):
         assert self.test_graph.make_essential() == Graph([[1 if i == j else 0 for i in range(100)] for j in range(100)])

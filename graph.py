@@ -19,6 +19,9 @@ class Graph:
         self.num_edges = len(self.edges)
         self.essential_vertices = [v for v in self.vertices if self.get_degree(v) != 2]
 
+    def __eq__(self, other):
+        return self.adj_matrix == other.adj_matrix
+
     # Returns dictionary of connected components of the graph, where:
     # the keys are 2-tuples of vertex sets and edge sets of the connected components of the graph, considered as subgraphs;
     # the values are the components as standalone 'Graph' objects.
@@ -155,9 +158,10 @@ class Graph:
     # Removes all vertices of degree 2 from the graph so that only essential vertices remain.
     def make_essential(self):
         non_essential_vertices = [v for v in self.vertices if v not in self.essential_vertices]
-        # If all vertices have degree 2, then we have a cycle graph and must therefore designate one degree 2 vertex as essential.
+        # If all vertices have degree 2, then our graph consists of cycles and we must therefore designate one degree 2 vertex as essential in each cycle.
         if self.essential_vertices == []:
-            non_essential_vertices.pop()
+            for component in self.get_connected_components():
+                non_essential_vertices.remove(component[0][0])
         new_edges = []
         removed_edges = []
         for v in non_essential_vertices:

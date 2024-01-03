@@ -183,5 +183,5 @@ class Graph:
         for (i, j) in new_edges:
             modified_adj_matrix[i][j] += 1
             modified_adj_matrix[j][i] += 1
-        essential_adj_matrix = [[modified_adj_matrix[i][j] for j in self.essential_vertices] for i in self.essential_vertices]
+        essential_adj_matrix = [[modified_adj_matrix[i][j] for j in self.vertices if j not in non_essential_vertices] for i in self.vertices if i not in non_essential_vertices]
         return Graph(essential_adj_matrix)

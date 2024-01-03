@@ -116,7 +116,7 @@ class TestGraph3Vertex:
     def test_get_num_connected_components(self):
         assert self.test_graph.get_num_connected_components() == 3
     def test_get_graph_minus_vertex(self):
-        assert self.test_graph.get_graph_minus_vertex(0) == (([2,3], []), Graph([[0,0],[0,0]]))
+        assert self.test_graph.get_graph_minus_vertex(0) == (([1,2], []), Graph([[0,0],[0,0]]))
     def test_get_degree(self):
         assert self.test_graph.get_degree(2) == 0
     def test_get_centreless_ball(self):

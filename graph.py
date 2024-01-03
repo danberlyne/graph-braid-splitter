@@ -11,16 +11,23 @@ class Graph:
         # Rows are numbered using `i` and columns are numbered using `j`.
         self.adj_matrix = adj_matrix
         # The vertices of the graph are numbered and encoded in a list.
-        self.vertices = [i for i in range(len(adj_matrix))]
+        if self.adj_matrix == [[]] or []:
+            self.vertices = []
+        else:
+            self.vertices = [i for i in range(len(adj_matrix))]
         self.num_vertices = len(self.vertices)
         # The edges of the graph are encoded as a list of 2-tuples (i, j) where i <= j.
         # That is, we only use the upper triangle of the matrix.
-        self.edges = [(i, j) for j in range(self.num_vertices) for i in range(j+1) for n in range(adj_matrix[i][j])]
+        if self.num_vertices == 0:
+            self.edges = []
+        else:
+            self.edges = [(i, j) for j in range(self.num_vertices) for i in range(j+1) for n in range(adj_matrix[i][j])]
         self.num_edges = len(self.edges)
         self.essential_vertices = [v for v in self.vertices if self.get_degree(v) != 2]
 
     def __eq__(self, other):
-        return self.adj_matrix == other.adj_matrix
+        trivial = ([], [[]])
+        return self.adj_matrix == other.adj_matrix or (self.adj_matrix in trivial and other.adj_matrix in trivial)
 
     # Returns dictionary of connected components of the graph, where:
     # the keys are 2-tuples of vertex sets and edge sets of the connected components of the graph, considered as subgraphs;

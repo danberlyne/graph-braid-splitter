@@ -2,6 +2,7 @@
 # graph.py - Graph class file.
 
 import copy
+from collections import defaultdict
 
 # Class for performing graph computations.
 class Graph:
@@ -73,7 +74,8 @@ class Graph:
             subgraph = (self.vertices, self.edges)
         for edge in subgraph[1]:
             if current_vertex in edge and edge not in component_edges:
-                component_edges.append(edge)
+                for e in [e for e in subgraph[1] if e == edge]:
+                    component_edges.append(e)
                 adjacent_vertex = edge[edge.index(current_vertex) - 1]
                 if adjacent_vertex not in component_vertices:    
                     component_vertices.append(adjacent_vertex)
@@ -147,20 +149,22 @@ class Graph:
     # The ball is centreless, meaning if `vertex` appears in the list, this means it is contained in a cycle.
     def get_centreless_ball(self, vertex, distance):
         ball = []
-        visited_edges = []
+        remaining_edges = defaultdict(int)
+        for edge in self.edges:
+            remaining_edges[edge] += 1
         if distance > 0:
-            self.iterate_ball(ball, visited_edges, vertex, distance)
+            self.iterate_ball(ball, remaining_edges, vertex, distance)
         return ball
     
-    def iterate_ball(self, ball, visited_edges, current_vertex, remaining_distance):
+    def iterate_ball(self, ball, remaining_edges, current_vertex, remaining_distance):
         for edge in self.edges:
-            if current_vertex in edge and edge not in visited_edges:
+            if current_vertex in edge and remaining_edges[edge] > 0:
                 adjacent_vertex = edge[edge.index(current_vertex) - 1]
                 if adjacent_vertex not in ball:
                     ball.append(adjacent_vertex)
-                    visited_edges.append(edge)
+                    remaining_edges[edge] -= 1
                     if remaining_distance >= 2:
-                        self.iterate_ball(ball, visited_edges, adjacent_vertex, remaining_distance - 1)
+                        self.iterate_ball(ball, remaining_edges, adjacent_vertex, remaining_distance - 1)
 
     # Removes all vertices of degree 2 from the graph so that only essential vertices remain.
     def make_essential(self):

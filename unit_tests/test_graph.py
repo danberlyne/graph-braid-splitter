@@ -224,7 +224,7 @@ class TestGraphK100:
     def test_get_graph_minus_vertex(self):
         assert self.test_graph.get_graph_minus_vertex(99) == (([i for i in range(99)], [(i,j) for i in range(99) for j in range(99) if i < j]), Graph([[1 if i != j else 0 for i in range(99)] for j in range(99)]))
     def test_prune(self):
-        assert self.test_graph.prune([(i,99) for i in range(99)]) == (Graph([[1 if (i == 98 and j == 99) or (i != j and i != 99 and j != 99) else 0 for i in range(100)] for j in range(100)]), [(i,99) for i in range(98)])
+        assert self.test_graph.prune([(i,99) for i in range(99)]) == (Graph([[1 if (i == 98 and j == 99) or (i == 99 and j == 98) or (i != j and i != 99 and j != 99) else 0 for i in range(100)] for j in range(100)]), [(i,99) for i in range(98)])
     def test_is_separating(self):
         assert not self.test_graph.is_separating((41,92))
     def test_get_degree(self):

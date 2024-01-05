@@ -22,7 +22,7 @@ class Graph:
         if self.num_vertices == 0:
             self.edges = []
         else:
-            self.edges = [(i, j) for j in range(self.num_vertices) for i in range(j+1) for n in range(adj_matrix[i][j])]
+            self.edges = [(i, j) for i in range(self.num_vertices) for j in range(i, self.num_vertices) for n in range(adj_matrix[i][j])]
         self.num_edges = len(self.edges)
         self.essential_vertices = [v for v in self.vertices if self.get_degree(v) != 2]
 

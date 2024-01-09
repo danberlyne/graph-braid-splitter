@@ -129,9 +129,9 @@ class Graph:
                 modified_graph = modified_graph.get_graph_minus_open_edges([edge])[1]
         return (modified_graph, removed_edges)
 
-    # Returns True if `edge` separates the graph into two connected components.
+    # Returns True if `edge` separates the graph into more connected components.
     def is_separating(self, edge):
-        if self.get_graph_minus_open_edges([edge])[1].get_num_connected_components() > 1:
+        if self.get_graph_minus_open_edges([edge])[1].get_num_connected_components() > self.get_num_connected_components():
             return True
         else:
             return False

@@ -239,7 +239,7 @@ class TestGraph100Cycles:
     test_graph = Graph(adj_matrix)
 
     def test_get_connected_components(self):
-        assert self.test_graph.get_connected_components() == {(tuple([100*k + i for i in range(100)]), tuple([(100*k + i, 100*k + i+1) for i in range(99)] + [(100*k, 100*k + 99)])) : 
+        assert self.test_graph.get_connected_components() == {(tuple([100*k + i for i in range(100)]), tuple([(100*k, 100*k + 1)] + [(100*k, 100*k + 99)] + [(100*k + i, 100*k + i+1) for i in range(1, 99)])) : 
                                                               Graph([[1 if (i == (j+1) % 100 or j == (i+1) % 100) else 0 for i in range(100)] for j in range(100)]) 
                                                               for k in range(100)}
     def test_get_component(self):
@@ -252,13 +252,13 @@ class TestGraph100Cycles:
     def test_get_graph_minus_closed_edge(self):
         edges = [(i, i+1) for i in range(97)]
         for k in range(1, 100):
-            edges += [(100*k + i, 100*k + i+1) for i in range(99)] + [(100*k, 100*k + 99)]
+            edges += [(100*k, 100*k + 1)] + [(100*k, 100*k + 99)] + [(100*k + i, 100*k + i+1) for i in range(1, 99)]
         assert self.test_graph.get_graph_minus_closed_edge((98,99)) == (([i for i in range(100*100) if i not in [98,99]], edges), 
                                                                         Graph([[1 if (i == j+1 or j == i+1) and (j < 97 or i < 97) else 0 for i in range(98)] + [1 if (i % 100 == (j+1) % 100 or j % 100 == (i+1) % 100) and (i-98) // 100 == (j-98) // 100 else 0 for i in range(98, 100*100 - 2)] for j in range(100*100 - 2)]))
     def test_get_graph_minus_vertex(self):
         edges = [(i, i+1) for i in range(98)]
         for k in range(1, 100):
-            edges += [(100*k + i, 100*k + i+1) for i in range(99)] + [(100*k, 100*k + 99)]
+            edges += [(100*k, 100*k + 1)] + [(100*k, 100*k + 99)] + [(100*k + i, 100*k + i+1) for i in range(1, 99)]
         assert self.test_graph.get_graph_minus_vertex(99) == (([i for i in range(100*100) if i != 99], edges), 
                                                               Graph([[1 if (i == j+1 or j == i+1) and (j < 98 or i < 98) else 0 for i in range(99)] + [1 if (i % 100 == (j+1) % 100 or j % 100 == (i+1) % 100) and (i-99) // 100 == (j-99) // 100 else 0 for i in range(99, 100*100 - 1)] for j in range(100*100 - 1)]))
     def test_prune(self):

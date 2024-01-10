@@ -185,7 +185,11 @@ class Graph:
             new_edges.append((edge_1[edge_1.index(v) - 1], edge_2[edge_2.index(v) - 1]))
         modified_adj_matrix = [[self.adj_matrix[i][j] for j in self.vertices] for i in self.vertices]
         for (i, j) in new_edges:
-            modified_adj_matrix[i][j] += 1
-            modified_adj_matrix[j][i] += 1
+            if i == j:
+                modified_adj_matrix[i][j] += 1
+            else:
+                modified_adj_matrix[i][j] += 1
+                modified_adj_matrix[j][i] += 1
         essential_adj_matrix = [[modified_adj_matrix[i][j] for j in self.vertices if j not in non_essential_vertices] for i in self.vertices if i not in non_essential_vertices]
+        print(essential_adj_matrix)
         return Graph(essential_adj_matrix)

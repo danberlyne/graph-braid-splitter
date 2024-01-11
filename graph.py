@@ -40,10 +40,12 @@ class Graph:
         if subgraph[0] == []:
             return {}
         # Otherwise, start with the component containing first vertex of `subgraph`
-        components = {self.get_component(subgraph[0][0], subgraph)[0]: self.get_component(subgraph[0][0], subgraph)[1]}
+        initial_component = self.get_component(subgraph[0][0], subgraph)
+        components = {initial_component[0]: initial_component[1]}
         for v in subgraph[0]:
             if v not in {w for component in components for w in component[0]}:
-                components.update({self.get_component(v, subgraph)[0]: self.get_component(v, subgraph)[1]})
+                new_component = self.get_component(v, subgraph)
+                components.update({new_component[0]: new_component[1]})
         return components
 
     # Returns a 2-tuple where the first entry is the 2-tuple (vertex set, edge set) of the connected component of `subgraph` containing `vertex` 
@@ -61,12 +63,13 @@ class Graph:
         component_edges.sort()
         component_adj_matrix = [[0 for j in range(len(component_vertices))] for i in range(len(component_vertices))]
         for edge in component_edges:
+            # Component vertices must be referred to by their index in the list when constructing the adjacency matrix
+            v0, v1 = component_vertices.index(edge[0]), component_vertices.index(edge[1])
             if edge[0] != edge[1]:
-                # Component vertices must be referred to by their index in the list when constructing the adjacency matrix
-                component_adj_matrix[component_vertices.index(edge[0])][component_vertices.index(edge[1])] += 1
-                component_adj_matrix[component_vertices.index(edge[1])][component_vertices.index(edge[0])] += 1
+                component_adj_matrix[v0][v1] += 1
+                component_adj_matrix[v1][v0] += 1
             else:
-                component_adj_matrix[component_vertices.index(edge[0])][component_vertices.index(edge[1])] += 1
+                component_adj_matrix[v0][v1] += 1
         return ((tuple(component_vertices), tuple(component_edges)), Graph(component_adj_matrix))
     
     def iterate_component(self, component_vertices, component_edges, current_vertex, subgraph = None):
@@ -123,10 +126,12 @@ class Graph:
     def prune(self, edges):
         modified_graph = self
         removed_edges = []
+        num_components = self.get_num_connected_components()
         for edge in edges:
-            if not modified_graph.is_separating(edge):
+            modified_graph_minus_edge = modified_graph.get_graph_minus_open_edges([edge])[1]
+            if modified_graph_minus_edge.get_num_connected_components() == num_components:
                 removed_edges.append(edge)
-                modified_graph = modified_graph.get_graph_minus_open_edges([edge])[1]
+                modified_graph = modified_graph_minus_edge
         return (modified_graph, removed_edges)
 
     # Returns True if `edge` separates the graph into more connected components.
@@ -169,12 +174,15 @@ class Graph:
     # Removes all vertices of degree 2 from the graph so that only essential vertices remain.
     def make_essential(self):
         non_essential_vertices = [v for v in self.vertices if v not in self.essential_vertices]
+        updated_essential_vertices = self.essential_vertices
         # If all vertices have degree 2, then our graph consists of cycles and we must therefore designate one degree 2 vertex as essential in each cycle.
         if self.essential_vertices == []:
             for component in self.get_connected_components():
                 non_essential_vertices.remove(component[0][0])
+            updated_essential_vertices = [v for v in self.vertices if v not in non_essential_vertices]
         new_edges = []
         removed_edges = []
+        # For each non-essential vertex, remove its adjacent edges and connect the two vertices on either side.
         for v in non_essential_vertices:
             adjacent_edges = [edge for edge in self.edges if edge not in removed_edges and v in edge] + [edge for edge in new_edges if v in edge]
             edge_1 = adjacent_edges[0]
@@ -190,6 +198,6 @@ class Graph:
             else:
                 modified_adj_matrix[i][j] += 1
                 modified_adj_matrix[j][i] += 1
-        essential_adj_matrix = [[modified_adj_matrix[i][j] for j in self.vertices if j not in non_essential_vertices] for i in self.vertices if i not in non_essential_vertices]
+        essential_adj_matrix = [[modified_adj_matrix[i][j] for j in updated_essential_vertices] for i in updated_essential_vertices]
         print(essential_adj_matrix)
         return Graph(essential_adj_matrix)

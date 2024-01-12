@@ -22,11 +22,10 @@ def integer_partitions(total_sum, num_parts):
 # Takes as input two adjacency matrices and returns True if they define the same graph.
 # Tip: To check if two Graph objects are homeomorphic, first use `make_essential` on both and then use `is_same` on their adjacency matrices.
 def is_same(adj_matrix_1, adj_matrix_2):
-    matrix_2_permutations = [[[adj_matrix_2[perm[i]][perm[j]] for i in range(len(adj_matrix_2))] for j in range(len(adj_matrix_2))] for perm in itertools.permutations(range(len(adj_matrix_2)), len(adj_matrix_2))]
-    if adj_matrix_1 in matrix_2_permutations:
-        return True
-    else:
-        return False
+    for perm in itertools.permutations(range(len(adj_matrix_2)), len(adj_matrix_2)):
+        if adj_matrix_1 == [[adj_matrix_2[perm[i]][perm[j]] for i in range(len(adj_matrix_2))] for j in range(len(adj_matrix_2))]:
+            return True
+    return False
 
 # Class for processing graph braid groups.
 # Note: This handles reduced graph braid groups, which are only isomorphic to the graph braid group if `is_reduced` returns True.

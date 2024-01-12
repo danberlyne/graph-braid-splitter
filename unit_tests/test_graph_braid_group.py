@@ -12,11 +12,52 @@ from graph import Graph
 # - 100-prong star graph, 10 particles
 # - 100 cycles each of length 100, 100 particles
 
-def test_integer_partitions():
-    assert True
+def test_integer_partitions_0_0():
+    assert list(integer_partitions(0, 0)) == [tuple()]
 
-def test_is_same():
-    assert True
+def test_integer_partitions_5_0():
+    assert list(integer_partitions(5, 0)) == [tuple()]
+
+def test_integer_partitions_2_1():
+    assert list(integer_partitions(2, 1)) == [(2,)]
+
+def test_integer_partitions_4_2():
+    assert list(integer_partitions(4, 2)) == [(0,4), (1,3), (2,2), (3,1), (4,0)]
+
+def test_integer_partitions_10_3():
+    assert list(integer_partitions(10, 3)) == [(0,0,10), (0,1,9), (0,2,8), (0,3,7), (0,4,6), (0,5,5), (0,6,4), (0,7,3), (0,8,2), (0,9,1), (0,10,0),
+                                               (1,0,9), (1,1,8), (1,2,7), (1,3,6), (1,4,5), (1,5,4), (1,6,3), (1,7,2), (1,8,1), (1,9,0),
+                                               (2,0,8), (2,1,7), (2,2,6), (2,3,5), (2,4,4), (2,5,3), (2,6,2), (2,7,1), (2,8,0),
+                                               (3,0,7), (3,1,6), (3,2,5), (3,3,4), (3,4,3), (3,5,2), (3,6,1), (3,7,0),
+                                               (4,0,6), (4,1,5), (4,2,4), (4,3,3), (4,4,2), (4,5,1), (4,6,0),
+                                               (5,0,5), (5,1,4), (5,2,3), (5,3,2), (5,4,1), (5,5,0),
+                                               (6,0,4), (6,1,3), (6,2,2), (6,3,1), (6,4,0),
+                                               (7,0,3), (7,1,2), (7,2,1), (7,3,0),
+                                               (8,0,2), (8,1,1), (8,2,0),
+                                               (9,0,1), (9,1,0),
+                                               (10,0,0)]
+
+def test_is_same_vertex():
+    assert is_same([[0]], [[0]])
+
+def test_is_same_dumbell():
+    adj_matrix_1 = [[0,1,0,1,1,0],[1,0,1,0,0,1],[0,1,0,0,0,1],[1,0,0,0,1,0],[1,0,0,1,0,0],[0,1,1,0,0,0]]
+    adj_matrix_2 = [[0,1,1,1,0,0],[1,0,1,0,0,0],[1,1,0,0,0,0],[1,0,0,0,1,1],[0,0,0,1,0,1],[0,0,0,1,1,0]]
+    assert is_same(adj_matrix_1, adj_matrix_2)
+
+def test_is_same_two_cycles():
+    adj_matrix_11 = [[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]]
+    adj_matrix_12 = [[0,1,1,0,0,0],[1,0,0,1,0,0],[1,0,0,0,1,0],[0,1,0,0,0,1],[0,0,1,0,0,1],[0,0,0,1,1,0]]
+    adj_matrix_1 = [row + [0 for i in range(6)] for row in adj_matrix_11] + [[0 for i in range(6)] + row for row in adj_matrix_12]
+    adj_matrix_21 = [[0,1,0,1,0,0],[1,0,1,0,0,0],[0,1,0,0,0,1],[1,0,0,0,1,0],[0,0,0,1,0,1],[0,0,1,0,1,0]]
+    adj_matrix_22 = [[0,1,1,0,0,0],[1,0,0,0,1,0],[1,0,0,1,0,0],[0,0,1,0,0,1],[0,1,0,0,0,1],[0,0,0,1,1,0]]
+    adj_matrix_2 = [row + [0 for i in range(6)] for row in adj_matrix_21] + [[0 for i in range(6)] + row for row in adj_matrix_22]
+    assert is_same(adj_matrix_1, adj_matrix_2)
+
+def test_is_same_cycle_dumbell():
+    adj_matrix_1 = [[0,1,0,1,1,0],[1,0,1,0,0,1],[0,1,0,0,0,1],[1,0,0,0,1,0],[1,0,0,1,0,0],[0,1,1,0,0,0]]
+    adj_matrix_2 = [[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]]
+    assert not is_same(adj_matrix_1, adj_matrix_2)
 
 class TestGraphBraidGroup:
     adj_matrix = [[0]]

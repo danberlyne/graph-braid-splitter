@@ -59,6 +59,32 @@ def test_is_same_cycle_dumbell():
     adj_matrix_2 = [[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]]
     assert not is_same(adj_matrix_1, adj_matrix_2)
 
+class TestGBGVertex_1:
+    adj_matrix = [[0]]
+    test_graph = Graph(adj_matrix)
+    test_particles = 1
+    test_config = [0]
+    test_gbg = GraphBraidGroup(test_graph, test_particles, test_config)
+
+    def test_has_sufficient_capacity(self):
+        assert self.test_gbg.has_sufficient_capacity([([0], [])], (1,))
+    def test_get_num_particles_per_component(self):
+        assert self.test_gbg.get_num_particles_per_component([0]) == {((0,), tuple()): 1}
+    def test_generate_initial_config(self):
+        assert self.test_gbg.generate_initial_config({((0,), tuple()): 1}) == [0]
+    def test_reindex(self):
+        assert self.test_gbg.reindex([0], []) == [0]
+    def test_is_trivial(self):
+        assert self.test_gbg.is_trivial()
+    def test_is_reduced(self):
+        assert self.test_gbg.is_reduced()
+    def test_get_splitting(self):
+        assert self.test_gbg.get_splitting() == []
+    def test_factorise(self):
+        assert self.test_gbg.factorise() == []
+    def test_is_same(self):
+        assert self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))
+
 class TestGraphBraidGroup:
     adj_matrix = [[0]]
     test_graph = Graph(adj_matrix)

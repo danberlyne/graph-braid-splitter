@@ -199,5 +199,4 @@ class Graph:
                 modified_adj_matrix[i][j] += 1
                 modified_adj_matrix[j][i] += 1
         essential_adj_matrix = [[modified_adj_matrix[i][j] for j in updated_essential_vertices] for i in updated_essential_vertices]
-        print(essential_adj_matrix)
         return Graph(essential_adj_matrix)

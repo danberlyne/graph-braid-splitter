@@ -15,6 +15,9 @@ class GraphOfGroups:
         # In this case, extra entries should be added to each edge 2-tuple to make it a unique key.
         self.edge_groups = edge_groups
 
+    def __eq__(self, other):
+        return self.graph == other.graph and self.vertex_groups == other.vertex_groups and self.edge_groups == other.edge_groups
+
     # Returns a splitting of the fundamental group of the graph of groups as a free product of non-trivial graphs of groups, given as a tuple of the factors.
     # Otherwise, returns the original graph of groups.
     def get_free_splitting(self):

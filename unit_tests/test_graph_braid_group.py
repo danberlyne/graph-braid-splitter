@@ -1,10 +1,9 @@
 from graph_braid_group import integer_partitions, is_same, GraphBraidGroup
 from graph import Graph
+from graph_of_groups import GraphOfGroups
 
 # TO DO: Create a class for each type of graph to be used in testing:
-# - Single vertex, 1 particle
-# - Segment of length 4, 3 particles
-# - Three segments of length 2, two particles
+# - Three segments of length 2, (3,1,0) particles
 # - 3-prong star graph and single vertex, (2,1) particles
 # - Two 3-prong star graphs, one subdivided, (3,3) particles
 # - K_5 subdivided, 2 particles
@@ -85,36 +84,37 @@ class TestGBGVertex_1:
     def test_is_same(self):
         assert self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))
 
-class TestGraphBraidGroup:
-    adj_matrix = [[0]]
+class TestGBGSegment_5:
+    # Segment of length 4
+    adj_matrix = [[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]
     test_graph = Graph(adj_matrix)
-    test_particles = 1
-    test_config = [0]
+    test_particles = 5
+    test_config = None
     test_gbg = GraphBraidGroup(test_graph, test_particles, test_config)
 
     def test_get_graph_of_groups(self):
-        assert True
+        assert self.test_gbg.get_graph_of_groups([(0,1), (1,2)]) == GraphOfGroups(Graph([[0]]), {0: GraphBraidGroup(Graph([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 5)}, {})
     def test_get_compatible_particles_per_component(self):
-        assert True
+        assert self.test_gbg.get_compatible_particles_per_component([(1,2)]) == [{((0,1), ((0,1),)): 2, ((2,3,4), ((2,3), (3,4))): 3}]
     def test_has_sufficient_capacity(self):
-        assert True
+        assert self.test_gbg.has_sufficient_capacity([(self.test_graph.vertices, self.test_graph.edges)], (5,))
     def test_get_num_particles_per_component(self):
-        assert True
+        assert self.test_gbg.get_num_particles_per_component(self.test_gbg.initial_config) == {(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)): 5}
     def test_generate_initial_config(self):
-        assert True
+        assert self.test_gbg.generate_initial_config({(tuple(self.test_graph.vertices), tuple(self.test_graph.edges)): 5}) == [0,1,2,3,4]
     def test_get_adjacent_assignments(self):
-        assert True
+        assert self.test_gbg.get_adjacent_assignments([(1,2)], [{((0,1), ((0,1),)): 2, ((2,3,4), ((2,3), (3,4))): 3}]) == []
     def test_get_compatible_assignments(self):
         assert True
     def test_reindex(self):
-        assert True
+        assert self.test_gbg.reindex([0,2,4], [1,3]) == [0,1,2]
     def test_is_trivial(self):
-        assert True
+        assert self.test_gbg.is_trivial()
     def test_is_reduced(self):
-        assert True
+        assert self.test_gbg.is_reduced()
     def test_get_splitting(self):
-        assert True
+        assert self.test_gbg.get_splitting() == []
     def test_factorise(self):
-        assert True
+        assert self.test_gbg.factorise() == []
     def test_is_same(self):
-        assert True
+        assert self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))

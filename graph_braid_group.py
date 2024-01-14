@@ -48,6 +48,9 @@ class GraphBraidGroup:
         # Uses Corollary 2.16 of [Graph of groups decompositions of graph braid groups](https://arxiv.org/pdf/2209.03860.pdf).
         self.num_connected_components = math.comb(self.num_particles + self.graph.get_num_connected_components() - 1, self.graph.get_num_connected_components() - 1)
 
+    def __eq__(self, other):
+        return self.graph == other.graph and self.num_particles == other.num_particles and self.num_initial_particles_per_component == other.num_initial_particles_per_component
+
     # Returns the graph of groups decomposition given by splitting along the edges of `graph` in list `edges`.
     # The edges in `edges` must all share a common vertex.
     # Uses Theorem 3.5 of [Graph of groups decompositions of graph braid groups](https://arxiv.org/pdf/2209.03860.pdf).

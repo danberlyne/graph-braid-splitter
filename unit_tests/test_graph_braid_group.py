@@ -134,12 +134,12 @@ class TestGBG3Segment_2_2_0:
                                                                             1: GraphBraidGroup(Graph([[0,0,0,0,0,0,0,0,0],[0,0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,0,0],[0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,1,0],[0,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,1,0]]), 4, [0,2,3,4])}, 
                                                                            {(0,1,(0,1),0): GraphBraidGroup(Graph([[0,0,0,0,0,0,0],[0,0,1,0,0,0,0],[0,1,0,1,0,0,0],[0,0,1,0,0,0,0],[0,0,0,0,0,1,0],[0,0,0,0,1,0,1],[0,0,0,0,0,1,0]]), 3, [0,1,2])})
     def test_get_compatible_particles_per_component(self):
-        assert self.test_gbg.get_compatible_particles_per_component([(0,1)]) == [{((0,), tuple()): 1, ((1,2), ((1,2),)): 1, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0}, 
-                                                                                 {((0,), tuple()): 0, ((1,2), ((1,2),)): 2, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0}]
+        assert self.test_gbg.get_compatible_particles_per_component([(0,1)]) == [{((0,), tuple()): 0, ((1,2), ((1,2),)): 2, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0}, 
+                                                                                 {((0,), tuple()): 1, ((1,2), ((1,2),)): 1, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0}]
     def test_has_sufficient_capacity(self):
         assert not self.test_gbg.has_sufficient_capacity([((0,1,2), ((0,1),(1,2))), ((3,4,5), ((3,4),(4,5))), ((6,7,8), ((6,7),(7,8)))], (4,0,0))
     def test_get_num_particles_per_component(self):
-        assert self.test_gbg.get_num_particles_per_component(self.test_gbg.initial_config) == {((0,1,2), ((0,1),(1,2))): 2, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0}
+        assert self.test_gbg.get_num_particles_per_component(self.test_gbg.initial_config) == {((0,1,2), ((0,1),(1,2))): 2, ((3,4,5), ((3,4),(4,5))): 2}
     def test_generate_initial_config(self):
         assert self.test_gbg.generate_initial_config({((0,1,2), ((0,1),(1,2))): 1, ((3,4,5), ((3,4),(4,5))): 0, ((6,7,8), ((6,7),(7,8))): 3}) == [0,6,7,8]
     def test_get_adjacent_assignments(self):
@@ -150,7 +150,7 @@ class TestGBG3Segment_2_2_0:
                                                             {((0,), tuple()): 0, ((1,2), ((1,2),)): 2, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0},
                                                             (0,1))]
     def test_get_compatible_assignments(self):
-        assert self.test_get_compatible_assignments([(0,1)], 
+        assert self.test_gbg.get_compatible_assignments([(0,1)], 
                                                     {((0,), tuple()): 1, ((1,2), ((1,2),)): 1, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0}, 
                                                     {((0,), tuple()): 0, ((1,2), ((1,2),)): 2, ((3,4,5), ((3,4),(4,5))): 2, ((6,7,8), ((6,7),(7,8))): 0},
                                                     (0,1)
@@ -166,4 +166,4 @@ class TestGBG3Segment_2_2_0:
     def test_factorise(self):
         assert self.test_gbg.factorise() == []
     def test_is_same(self):
-        assert not self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))
+        assert self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))

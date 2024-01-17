@@ -49,7 +49,7 @@ class GraphBraidGroup:
         self.num_connected_components = math.comb(self.num_particles + self.graph.get_num_connected_components() - 1, self.graph.get_num_connected_components() - 1)
 
     def __eq__(self, other):
-        return self.graph == other.graph and self.num_particles == other.num_particles and self.num_initial_particles_per_component == other.num_initial_particles_per_component
+        return self.is_same(other)
 
     # Returns the graph of groups decomposition given by splitting along the edges of `graph` in list `edges`.
     # The edges in `edges` must all share a common vertex.
@@ -102,7 +102,6 @@ class GraphBraidGroup:
             else:
                 gog_adj_matrix[e[0]][e[1]] += 1
         gog_graph = Graph(gog_adj_matrix)
-        print([i for i in edge_groups])
         return GraphOfGroups(gog_graph, vertex_groups, edge_groups)
   
     # Returns a list of dictionaries, where each dictionary assigns a number of particles to each component of the graph minus the open edges in `edges`.
@@ -146,6 +145,7 @@ class GraphBraidGroup:
                 return False
         return True
     
+    # Note: `num_particle_per_component` does not list components that contain zero particles. This is an important feature; see e.g. `is_trivial()`.
     def get_num_particles_per_component(self, config):
         num_particles_per_component = defaultdict(int)
         for v in config:

@@ -29,6 +29,13 @@ class Graph:
     def __eq__(self, other):
         trivial = ([], [[]])
         return self.adj_matrix == other.adj_matrix or (self.adj_matrix in trivial and other.adj_matrix in trivial)
+    
+    def __hash__(self):
+        trivial = ([], [[]])
+        if self.adj_matrix in trivial:
+            return hash(tuple())
+        else:
+            return hash(tuple(tuple(row) for row in self.adj_matrix))
 
     # Returns dictionary of connected components of the graph, where:
     # the keys are 2-tuples of vertex sets and edge sets of the connected components of the graph, considered as subgraphs;

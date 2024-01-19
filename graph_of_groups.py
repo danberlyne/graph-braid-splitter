@@ -15,9 +15,6 @@ class GraphOfGroups:
         # In this case, extra entries should be added to each edge 2-tuple to make it a unique key.
         self.edge_groups = edge_groups
 
-    def __eq__(self, other):
-        return self.graph == other.graph and self.vertex_groups == other.vertex_groups and self.edge_groups == other.edge_groups
-
     # Returns a splitting of the fundamental group of the graph of groups as a free product of non-trivial graphs of groups, given as a tuple of the factors.
     # Otherwise, returns the original graph of groups.
     def get_free_splitting(self):
@@ -126,3 +123,22 @@ class GraphOfGroups:
             return (tuple(reduced_graph[0]), tuple(reduced_graph[1]))
         else:
             return self.trim(reduced_graph)
+        
+    def is_same(self, other):
+        if self.graph.adj_matrix != other.graph.adj_matrix:
+            return False
+        for v in self.vertex_groups:
+            if self.vertex_groups[v] == other.vertex_groups[v]:
+                continue
+            elif type(self.vertex_groups[v]) == type(other.vertex_groups[v]) and type(self.vertex_groups[v]) != str and self.vertex_groups[v].is_same(other.vertex_groups[v]):  # noqa: E721
+                continue
+            else:
+                return False
+        for e in self.edge_groups:
+            if self.edge_groups[e] == other.edge_groups[e]:
+                continue
+            elif type(self.edge_groups[e]) == type(other.edge_groups[e]) and type(self.edge_groups[e]) != str and self.edge_groups[e].is_same(other.edge_groups[e]):  # noqa: E721
+                continue
+            else:
+                return False
+        return True

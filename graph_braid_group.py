@@ -99,6 +99,9 @@ class GraphBraidGroup:
             else:
                 gog_adj_matrix[e[0]][e[1]] += 1
         gog_graph = Graph(gog_adj_matrix)
+        print(gog_adj_matrix)
+        print([(v, vertex_groups[v].initial_config) for v in vertex_groups])
+        print([(e, edge_groups[e].initial_config) for e in edge_groups])
         return GraphOfGroups(gog_graph, vertex_groups, edge_groups)
   
     # Returns a list of dictionaries, where each dictionary assigns a number of particles to each component of the graph minus the open edges in `edges`.
@@ -229,8 +232,8 @@ class GraphBraidGroup:
             subcomponents = initial_subcomponents + terminal_subcomponents
             # We use `assignment_2` for the partitions of the initial component because we want to exclude the active particle,
             # which is in the terminal component in `assignment_2`. Similarly, we choose `assignment_1` for partitions of the terminal component.
-            new_partitions_initial = integer_partitions(assignment_2[initial_component], len(initial_subcomponents))
-            new_partitions_terminal = integer_partitions(assignment_1[terminal_component], len(terminal_subcomponents))
+            new_partitions_initial = [partition for partition in integer_partitions(assignment_2[initial_component], len(initial_subcomponents))]
+            new_partitions_terminal = [partition for partition in integer_partitions(assignment_1[terminal_component], len(terminal_subcomponents))]
             if len(initial_subcomponents) == 0:
                 new_partitions = [terminal_partition for terminal_partition in new_partitions_terminal]
             elif len(terminal_subcomponents) == 0:

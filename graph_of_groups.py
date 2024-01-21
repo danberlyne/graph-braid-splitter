@@ -130,14 +130,16 @@ class GraphOfGroups:
         for v in self.vertex_groups:
             if self.vertex_groups[v] == other.vertex_groups[v]:
                 continue
-            elif type(self.vertex_groups[v]) == type(other.vertex_groups[v]) and type(self.vertex_groups[v]) != str and self.vertex_groups[v].is_same(other.vertex_groups[v]):  # noqa: E721
+            elif isinstance(self.vertex_groups[v], type(other.vertex_groups[v])) and not isinstance(self.vertex_groups[v], str) and self.vertex_groups[v].is_same(other.vertex_groups[v]):
                 continue
             else:
                 return False
         for e in self.edge_groups:
+            if e not in other.edge_groups:
+                return False
             if self.edge_groups[e] == other.edge_groups[e]:
                 continue
-            elif type(self.edge_groups[e]) == type(other.edge_groups[e]) and type(self.edge_groups[e]) != str and self.edge_groups[e].is_same(other.edge_groups[e]):  # noqa: E721
+            elif isinstance(self.edge_groups[e], type(other.edge_groups[e])) and not isinstance(self.edge_groups[e], str) and self.edge_groups[e].is_same(other.edge_groups[e]):
                 continue
             else:
                 return False

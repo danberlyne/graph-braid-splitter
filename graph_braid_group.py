@@ -99,9 +99,6 @@ class GraphBraidGroup:
             else:
                 gog_adj_matrix[e[0]][e[1]] += 1
         gog_graph = Graph(gog_adj_matrix)
-        print(gog_adj_matrix)
-        print([(v, vertex_groups[v].initial_config) for v in vertex_groups])
-        print([(e, edge_groups[e].initial_config) for e in edge_groups])
         return GraphOfGroups(gog_graph, vertex_groups, edge_groups)
   
     # Returns a list of dictionaries, where each dictionary assigns a number of particles to each component of the graph minus the open edges in `edges`.

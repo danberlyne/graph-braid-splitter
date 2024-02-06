@@ -242,3 +242,53 @@ class TestGBGTwo3ProngStar_3_3:
         assert len(self.test_gbg.factorise()) == 1 and self.test_gbg.factorise()[0].is_same(GraphBraidGroup(Graph(factor_matrix), 3))
     def test_is_same(self):
         assert not self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))
+
+class TestGBGK5_2:
+    # Complete graph on 5 vertices
+    adj_matrix = [[0,1,1,1,1],
+                  [1,0,1,1,1],
+                  [1,1,0,1,1],
+                  [1,1,1,0,1],
+                  [1,1,1,1,0]]
+    test_graph = Graph(adj_matrix)
+    test_particles = 2
+    test_config = [0,1]
+    test_gbg = GraphBraidGroup(test_graph, test_particles, test_config)
+
+    def test_get_graph_of_groups(self):
+        assert self.test_gbg.get_graph_of_groups([(3,4)]).is_same(GraphOfGroups(Graph([[1]]), 
+                                                                  {0: GraphBraidGroup(Graph([[0,1,1,1,1],[1,0,1,1,1],[1,1,0,1,1],[1,1,1,0,0],[1,1,1,0,0]]), 2, [0,1])}, 
+                                                                  {(0,0,(3,4),0): GraphBraidGroup(Graph([[0,1,1],[1,0,1],[1,1,0]]), 1, [0])})
+                                                                 )
+    def test_get_compatible_particles_per_component(self):
+        assert self.test_gbg.get_compatible_particles_per_component([(3,4)]) == [{((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4))): 2}]
+    def test_has_sufficient_capacity(self):
+        assert self.test_gbg.has_sufficient_capacity([((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4)))], (2,))
+    def test_get_num_particles_per_component(self):
+        assert self.test_gbg.get_num_particles_per_component(self.test_config) == {((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4))): 2}
+    def test_generate_initial_config(self):
+        assert self.test_gbg.generate_initial_config({((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4))): 2}) == [0,1]
+    def test_get_adjacent_assignments(self):
+        assert self.test_gbg.get_adjacent_assignments([(3,4)], 
+                                                      [{((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4))): 2}] 
+                                                     ) == [({((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4))): 2}, 
+                                                            {((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4))): 2},
+                                                            (3,4))]
+    def test_get_compatible_assignments(self):
+        assert self.test_gbg.get_compatible_assignments([(3,4)], 
+                                                        {((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4))): 2}, 
+                                                        {((0,1,2,3,4), ((0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4))): 2},
+                                                        (3,4)
+                                                       ) == [{((0,1,2), ((0,1),(0,2),(1,2))): 1}]
+    def test_reindex(self):
+        assert True
+    def test_is_trivial(self):
+        assert not self.test_gbg.is_trivial()
+    def test_is_reduced(self):
+        assert self.test_gbg.is_reduced()
+    def test_get_splitting(self):
+        assert len(self.test_gbg.get_splitting()) == 1 and self.test_gbg.get_splitting()[0].is_same(self.test_gbg)
+    def test_factorise(self):
+        assert len(self.test_gbg.factorise()) == 1 and self.test_gbg.factorise()[0].is_same(self.test_gbg)
+    def test_is_same(self):
+        assert not self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))

@@ -31,7 +31,7 @@ class GraphOfGroups:
         num_free_Z = len(removed_edges)
         modified_edge_groups = {edge: self.edge_groups[edge] for edge in self.edge_groups if edge not in removed_edges}
         modified_gog = GraphOfGroups(modified_graph, self.vertex_groups, modified_edge_groups)
-        # If a separating edge has trivial edge group and all the vertex groups of a connected component are trivial, then we throw away that commponent.
+        # If a separating edge has trivial edge group and all the vertex groups of a connected component are trivial, then we throw away that component.
         trivial_sep_edges = [edge for edge in trivial_edges if edge not in removed_edges]
         # This is a 3-tuple of a subgraph, a list of the associated vertex groups, and a list of the associated edge groups
         reduced_gog_data = modified_gog.reduce(trivial_sep_edges)

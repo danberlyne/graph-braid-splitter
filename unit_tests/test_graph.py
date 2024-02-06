@@ -1,8 +1,5 @@
 from graph import Graph
 
-# TO DO: Create a class for each type of graph to be used in testing:
-# - 100 cycles each of length 100
-
 class TestGraphVertex:
     adj_matrix = [[0]]
     test_graph = Graph(adj_matrix)

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # graph_of_groups.py - GraphOfGroups class file.
 
+from collections import defaultdict
+
 # Class for processing graphs of groups
 # Note, monomorphisms are omitted since we do not need this data to detect free splittings.
 # For this reason, we do not need our graphs to be directed, either.
@@ -26,7 +28,13 @@ class GraphOfGroups:
             return (self,)
         # First, remove non-separating edges with trivial edge group, one by one.
         (modified_graph, removed_edges_unlabelled) = self.graph.prune(trivial_edges_unlabelled)
-        removed_edges = [trivial_edges[trivial_edges_unlabelled.index(edge)] for edge in removed_edges_unlabelled]
+        removed_edges = []
+        edge_counts = defaultdict(int)
+        for edge in removed_edges_unlabelled:
+            edge_indices = [i for i, e in enumerate(trivial_edges_unlabelled) if e == edge]
+            # Get the labelled versions of the removed edges, making sure not to repeat the same label twice.
+            removed_edges.append(trivial_edges[edge_indices[edge_counts[edge]]])
+            edge_counts[edge] += 1
         # We record the edges we removed, which each correspond to a free Z factor, then continue our analysis on the graph minus these edges.
         num_free_Z = len(removed_edges)
         modified_edge_groups = {edge: self.edge_groups[edge] for edge in self.edge_groups if edge not in removed_edges}

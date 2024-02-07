@@ -333,7 +333,7 @@ class GraphBraidGroup:
             if direct_factor_splittings[direct_factor] == (direct_factor,):
                 current_splitting.append(direct_factor)
             # Otherwise, append a list of the free factors, where each free factor is either of the form F_n or a graph of groups.
-            # If a free factor is a non-trivial single-vertex graph of groups, split the graph braid group a direct product (if possible).
+            # If a free factor is a non-trivial single-vertex graph of groups, split the graph braid group as a direct product (if possible).
             # Keep alternating between direct product splittings and free product splittings like this.
             else:
                 next_free_splitting = []

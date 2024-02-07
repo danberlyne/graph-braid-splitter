@@ -1,10 +1,18 @@
 from graph_braid_group import integer_partitions, is_same, GraphBraidGroup
 from graph import Graph
 from graph_of_groups import GraphOfGroups
+from math import comb
+from itertools import combinations
 
-# TO DO: Create a class for each type of graph to be used in testing:
-# - K_5 subdivided, 2 particles
-# - 100-prong star graph, not subdivided, 10 particles
+def split_star(prongs, particles):
+    if prongs > particles + 1 and particles > 2:
+        return [[f'F_{comb(prongs-1, particles-1) - 1}', split_star(prongs-1, particles-1), split_star(prongs-1, particles)]]
+    elif prongs == particles + 1 and particles > 2:
+        return [[f'F_{comb(prongs-1, particles-1) - 1}', split_star(prongs-1, particles-1)]]
+    elif prongs > particles + 1 and particles == 2:
+        return [[f'F_{comb(prongs-1, particles-1) - 1}', split_star(prongs-1, particles)]]
+    else:
+        return [['F_1']]
 
 def test_integer_partitions_0_0():
     assert list(integer_partitions(0, 0)) == [tuple()]
@@ -288,6 +296,62 @@ class TestGBGK5_2:
         assert self.test_gbg.is_reduced()
     def test_get_splitting(self):
         assert len(self.test_gbg.get_splitting()) == 1 and self.test_gbg.get_splitting()[0].is_same(self.test_gbg)
+    def test_factorise(self):
+        assert len(self.test_gbg.factorise()) == 1 and self.test_gbg.factorise()[0].is_same(self.test_gbg)
+    def test_is_same(self):
+        assert not self.test_gbg.is_same(GraphBraidGroup(Graph([[0,1,0,0,0],[1,0,1,0,0],[0,1,0,1,0],[0,0,1,0,1],[0,0,0,1,0]]), 3))
+
+class TestGBG10Prong_5:
+    # 10-prong radial tree, not subdivided
+    adj_matrix = [[0] + [1]*10] + [[1] + [0]*10 for i in range(10)]
+    test_graph = Graph(adj_matrix)
+    test_particles = 5
+    test_config = [0,1,2,3,4]
+    test_gbg = GraphBraidGroup(test_graph, test_particles)
+
+    def test_get_graph_of_groups(self):
+        gog_graph = Graph([[0, comb(9,4)], [comb(9,4), 0]])
+        graph_minus_open_edge = Graph([[0,0] + [1]*9] + [[0]*11] + [[1] + [0]*10 for i in range(9)])
+        graph_minus_closed_edge = Graph([[0] * 9] * 9)
+        assert self.test_gbg.get_graph_of_groups([(0,1)]).is_same(GraphOfGroups(gog_graph, 
+                                                                  {0: GraphBraidGroup(graph_minus_open_edge, 5, [0,1,2,3,4]), 1: GraphBraidGroup(graph_minus_open_edge, 5, [0,2,3,4,5])}, 
+                                                                  {(0,1,(0,1),i): GraphBraidGroup(graph_minus_closed_edge, 4, [0,1,2,3]) for i in range(comb(9,4))})
+                                                                 )
+    def test_get_compatible_particles_per_component(self):
+        assert self.test_gbg.get_compatible_particles_per_component([(0,1)]) == [{((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 4, ((1,), tuple()): 1},
+                                                                                 {((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 5, ((1,), tuple()): 0}
+                                                                                ]
+    def test_has_sufficient_capacity(self):
+        assert self.test_gbg.has_sufficient_capacity([((0,)+tuple([i+2 for i in range(9)]), ((0,i+2) for i in range(9))), ((1,), tuple())], (4,1))
+    def test_get_num_particles_per_component(self):
+        assert self.test_gbg.get_num_particles_per_component(self.test_config) == {(tuple([i for i in range(11)]), tuple([(0,i+1) for i in range(10)])): 5}
+    def test_generate_initial_config(self):
+        assert self.test_gbg.generate_initial_config({((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 4, ((1,), tuple()): 1}) == [0,2,3,4,1]
+    def test_get_adjacent_assignments(self):
+        assert self.test_gbg.get_adjacent_assignments([(0,1)], 
+                                                      [{((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 5, ((1,), tuple()): 0},
+                                                       {((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 4, ((1,), tuple()): 1}] 
+                                                     ) == [({((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 5, ((1,), tuple()): 0},
+                                                            {((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 4, ((1,), tuple()): 1},
+                                                            (0,1))]
+    def test_get_compatible_assignments(self):
+        assert sorted(self.test_gbg.get_compatible_assignments([(0,1)], 
+                                                               {((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 5, ((1,), tuple()): 0},
+                                                               {((0,) + tuple([i+2 for i in range(9)]), tuple([(0,i+2) for i in range(9)])): 4, ((1,), tuple()): 1},
+                                                               (0,1)), 
+                      key=lambda d: tuple(d.values())
+                     ) == sorted([{((i,), tuple()): 1 if i in c else 0 for i in range(2,11)} for c in combinations(range(2,11),4)], 
+                                 key=lambda d: tuple(d.values()))
+    def test_reindex(self):
+        assert True
+    def test_is_trivial(self):
+        assert not self.test_gbg.is_trivial()
+    def test_is_reduced(self):
+        assert not self.test_gbg.is_reduced()
+    def test_get_splitting(self):
+        print(f'True:\n{self.test_gbg.get_splitting()}')
+        print(f'Test:\n{split_star(10,5)}')
+        assert self.test_gbg.get_splitting() == split_star(10, 5)
     def test_factorise(self):
         assert len(self.test_gbg.factorise()) == 1 and self.test_gbg.factorise()[0].is_same(self.test_gbg)
     def test_is_same(self):

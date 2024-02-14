@@ -70,8 +70,7 @@ class GraphOfGroups:
         return (f'F_{num_free_Z}',) + tuple(factor_gogs)
     
     # Given a collection of separating edges with trivial edge groups, checks for triviality of the fundamental groups of the connected components of the 
-    # graph minus the edge, for each edge. If any are trivial, removes these components. Then removes degree 1 vertex groups whose incident edge group is
-    # equal to the vertex group. Returns the remainder, given as a 3-tuple subgraph of groups.
+    # graph minus the edge, for each edge. If any are trivial, removes these components.
     def reduce(self, trivial_sep_edges):
         if trivial_sep_edges == []:
             return ((self.graph.vertices, self.graph.edges), self.vertex_groups, self.edge_groups)

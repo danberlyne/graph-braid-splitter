@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # graph.py - Graph class file.
-"""A module for graph functionality.
+"""
+A module for graph functionality.
 
 Module contents: 
-- The Graph class, which implements methods for performing graph computations.
+- The `Graph` class, which implements methods for performing graph computations.
 """
 
 import copy
@@ -13,10 +14,13 @@ class Graph:
     """Class for performing graph computations."""
 
     def __init__(self, adj_matrix):
-        """The adjacency matrix should be a tuple of tuples or a list of lists. Rows are numbered using `i` and columns are numbered using `j`.
+        """
+        Initialises graph attributes.
+
+        `adj_matrix` is the adjacency matrix; it should be a tuple of tuples or a list of lists. 
         
         The vertices of the graph are numbered according to their row/column in the matrix and encoded in a list.
-        The edges of the graph are encoded as a list of 2-tuples (i, j) where i <= j. That is, we only use the upper triangle of the matrix.
+        The edges of the graph are encoded as a list of 2-tuples (i, j) where i <= j.
         """
         self.adj_matrix = adj_matrix
         if self.adj_matrix == [[]] or []:
@@ -45,9 +49,15 @@ class Graph:
             return hash(tuple(tuple(row) for row in self.adj_matrix))
 
     def get_connected_components(self, subgraph = None):
-        """Returns dictionary of connected components of the graph.
+        """
+        Returns dictionary of connected components of the (sub)graph.
 
-        In this dictionary:
+        If a subgraph is specified, returns the connected components of the subgraph.
+        `subgraph` should be a (vertex set, edge set) 2-tuple of sublists of `self.vertices` and `self.edges`.
+        Vertices are represented by integers corresponding to the row number in the adjacency matrix, and edges are 2-tuples of integers.
+        If left blank, `subgraph` defaults to the entire graph.
+        
+        In the returned dictionary:
         - the keys are 2-tuples of vertex sets and edge sets of the connected components of the graph, considered as subgraphs;
         - the values are the components as standalone Graph objects.
         """
@@ -64,12 +74,15 @@ class Graph:
         return components
 
     def get_component(self, vertex, subgraph = None):
-        """Returns a 2-tuple representing the connected component of the given subgraph containing the given vertex.
+        """
+        Returns a 2-tuple representing the connected component of the (sub)graph containing the given vertex.
         
-        The first entry in the 2-tuple is the (vertex set, edge set) 2-tuple of the connected component of `subgraph` containing `vertex`.
-        The second entry in the 2-tuple is the connected component as a standalone Graph object.
-        Note, `subgraph` should be a (vertex set, edge set) 2-tuple of sublists of `self.vertices` and `self.edges`.
+        `subgraph` should be a (vertex set, edge set) 2-tuple of sublists of `self.vertices` and `self.edges`.
+        Vertices are represented by integers corresponding to the row number in the adjacency matrix, and edges are 2-tuples of integers.
         If left blank, `subgraph` defaults to the entire graph.
+        
+        The first entry in the returned 2-tuple is the (vertex set, edge set) 2-tuple of the connected component of `subgraph` containing `vertex`.
+        The second entry in the returned 2-tuple is the connected component as a standalone `Graph` object.
         """
         if subgraph is None:
             subgraph = (self.vertices, self.edges)
@@ -108,11 +121,15 @@ class Graph:
         return len(self.get_connected_components())
 
     def get_graph_minus_open_edges(self, removed_edges):
-        """Returns a 2-tuple representing the graph minus the given edges, considered as open edges.
+        """
+        Returns a 2-tuple representing the graph minus the given edges, considered as open edges.
 
-        In this 2-tuple:
+        `removed_edges` should be a list of edges in `self.edges` to be removed from the graph.
+        Edges are 2-tuples of integers corresponding to the row number and column number in the adjacency matrix.
+
+        In the returned 2-tuple:
         - the first entry is the 2-tuple of vertices and edges of the graph minus `removed_edges`, considered as a subgraph of the original graph;
-        - the second entry is the graph minus `removed_edges` as an object of class Graph.
+        - the second entry is the graph minus `removed_edges` as an object of class `Graph`.
         """
         adj_matrix_minus_open_edges = copy.deepcopy(self.adj_matrix)
         subgraph_vertices = [v for v in self.vertices]
@@ -127,12 +144,17 @@ class Graph:
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_open_edges))
 
     def get_graph_minus_closed_edge(self, removed_edge):
-        """Returns a 2-tuple representing the graph minus the given edge, considered as a closed edge.
+        """
+        Returns a 2-tuple representing the graph minus the given edge, considered as a closed edge.
+
+        `removed_edge` should be an edge in `self.edges` to be removed from the graph.
+        Edges are 2-tuples of integers corresponding to the row number and column number in the adjacency matrix.
 
         Note, this is equivalent to removing this edge's two vertices together with all edges containing one of these vertices.
-        In this 2-tuple:
+        
+        In the returned 2-tuple:
         - the first entry is the 2-tuple of vertices and edges of the graph minus `removed_edge`, considered as a subgraph of the original graph;
-        - the second entry is the graph minus `removed_edge` as an object of class Graph.
+        - the second entry is the graph minus `removed_edge` as an object of class `Graph`.
         """
         (i, j) = removed_edge
         subgraph_vertices = [v for v in self.vertices if v not in (i, j)]
@@ -143,9 +165,17 @@ class Graph:
 
 
     def get_graph_minus_vertex(self, removed_vertex):
-        """Returns a 2-tuple representing the graph minus the given vertex.
-        
+        """
+        Returns a 2-tuple representing the graph minus the given vertex.
+
+        `removed_vertex` should be a vertex in `self.vertices` to be removed from the graph.
+        Vertices are integers corresponding to the row number in the adjacency matrix.
+
         Note, this is equivalent to removing the vertex together with all edges containing it.
+
+        In the returned 2-tuple:
+        - the first entry is the 2-tuple of vertices and edges of the graph minus `removed_vertex`, considered as a subgraph of the original graph;
+        - the second entry is the graph minus `removed_vertex` as an object of class `Graph`.
         """
         subgraph_vertices = [v for v in self.vertices if v != removed_vertex]
         subgraph_edges = [e for e in self.edges if removed_vertex not in e]
@@ -154,9 +184,16 @@ class Graph:
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_vertex))
 
     def prune(self, edges):
-        """Iteratively checks whether the given edges are non-separating and removes them if so, returning the pruned graph and a list of removed edges.
+        """
+        Iteratively checks whether the given edges are non-separating and removes them if so, returning the pruned graph and a list of removed edges.
         
-        Goes through the list `edges` one by one and checks if the edge is non-separating. If so, removes that (open) edge and repeats on the new graph.
+        Goes through the list `edges` one by one and checks if the edge is non-separating. 
+        If so, removes that (open) edge and repeats on the new graph.
+
+        `edges` should be a list of candidate edges in `self.edges` for pruning.
+        Edges are 2-tuples of integers corresponding to the row number and column number in the adjacency matrix.
+
+        Returns a (vertex set, edge set) 2-tuple representing the pruned graph.
         """
         modified_graph = self
         removed_edges = []
@@ -169,14 +206,24 @@ class Graph:
         return (modified_graph, removed_edges)
 
     def is_separating(self, edge):
-        """Returns True if the given edge separates the graph into more connected components."""
+        """
+        Returns True if the given edge separates the graph into more connected components.
+        
+        `edge` should be an edge in `self.edges`.
+        Edges are 2-tuples of integers corresponding to the row number and column number in the adjacency matrix.
+        """
         if self.get_graph_minus_open_edges([edge])[1].get_num_connected_components() > self.get_num_connected_components():
             return True
         else:
             return False
     
     def get_degree(self, vertex):
-        """Returns the degree of the given vertex in the graph."""
+        """
+        Returns the degree of the given vertex in the graph.
+        
+        `vertex` should be a vertex in `self.vertices`.
+        Vertices are integers corresponding to the row number in the adjacency matrix.
+        """
         degree = 0
         for edge in self.edges:
             if edge == (vertex, vertex):
@@ -186,7 +233,12 @@ class Graph:
         return degree
     
     def get_centreless_ball(self, vertex, distance):
-        """Returns a list of all vertices that can be reached from the given vertex via a path of length at least 1 and at most the given distance.
+        """
+        Returns a list of all vertices that can be reached from the given vertex via a path of length at least 1 and at most the given distance.
+
+        `vertex` should be a vertex in `self.vertices`.
+        Vertices are integers corresponding to the row number in the adjacency matrix.
+        `distance` should be an integer representing the radius of the ball.
 
         The ball is centreless, meaning if `vertex` appears in the list, this means it is contained in a cycle.
         """
@@ -209,9 +261,10 @@ class Graph:
                         self.iterate_ball(ball, remaining_edges, adjacent_vertex, remaining_distance - 1)
 
     def make_essential(self):
-        """Removes vertices of degree 2 from the graph until only essential vertices remain, returning the essential graph.
+        """
+        Removes vertices of degree 2 from the graph until only essential vertices remain, returning the essential graph.
         
-        Returns the essential graph as a Graph object.
+        Returns the essential graph as a `Graph` object.
         """
         non_essential_vertices = [v for v in self.vertices if v not in self.essential_vertices]
         updated_essential_vertices = self.essential_vertices

@@ -84,7 +84,25 @@ class GraphBraidGroup:
         Edges are 2-tuples of integers corresponding to the row number and column number in the adjacency matrix.
 
         The graph of groups decomposition is returned as a `GraphOfGroups` object.
-        
+
+        The vertex groups are the different braid groups of the graph minus the open edges in `edges` that arise from different initial configurations.
+        These correspond to all the different assignments of particles to the connected components of the graph minus the open edges that are compatible with `graph.initial_config`.
+        We therefore enumerate the particle assignments by putting them in a list and return the vertex groups as a dictionary, where:
+        - the keys are the indices of the particle assignments in the list; 
+        - the values are the braid groups corresponding to the particle assignments.
+
+        The edge groups of the graph of groups are braid groups of the graph minus a single closed edge in `edges`, with one fewer particle.
+        An edge group connects two vertex groups if the corresponding particle assignments differ by moving a single particle (the 'active particle') along the closed edge.
+        The initial configuration of the edge group is an initial configuration of either of the vertex groups with the active particle removed.
+        Note, removing the closed edge may further disconnect the graph, thus there may be multiple possible configurations, corresponding to the different compatible assignments of particles to connected components of the graph minus the closed edge.
+        There is one edge group for each compatible assignment.
+        We therefore return the edge groups as a dictionary, where:
+        - the keys are 4-tuples consisting of
+         -- the indices of the particle assignments of the two vertex groups
+         -- the edge by which the assignments differ
+         -- the index of a compatible assignment for the edge group in the list of all compatible assignments for that edge group;
+        - the values are the corresponding graph braid groups.
+
         Uses Theorem 3.5 of [Graph of groups decompositions of graph braid groups](https://arxiv.org/pdf/2209.03860.pdf).
         """
         # `graph_minus_open_edges` is a 2-tuple consisting of:
@@ -95,29 +113,11 @@ class GraphBraidGroup:
         # Components are given as (vertex set, edge set) 2-tuples.
         # This list consists of all such assignments that are compatible with `initial_config`.
         compatible_particles_per_component = self.get_compatible_particles_per_component(edges)
-        # The vertex groups are the different braid groups of the graph minus the open edges that arise from different initial configurations.
-        # These correspond to all the different assignments of particles to the connected components of `graph_minus_open_edges` that are 
-        # compatible with `initial_config`.
-        # We therefore enumerate the particle assignments by putting them in a list and construct a dictionary where:
-        # - the keys are the indices of the particle assignments in the list; 
-        # - the values are the braid groups corresponding to the particle assignments.
         vertex_particle_assignments = [particle_assignment for particle_assignment in compatible_particles_per_component]
         vertex_groups = {i: GraphBraidGroup(graph_minus_open_edges[1], self.num_particles, self.generate_initial_config(vertex_particle_assignments[i])) 
                          for i in range(len(vertex_particle_assignments))}
+        
         graphs_minus_closed_edges = {edge: self.graph.get_graph_minus_closed_edge(edge) for edge in edges}
-        # The edge groups are braid groups of the graph minus a single closed edge in `edges`, with one fewer particle.
-        # An edge group connects two vertex groups if the corresponding particle assignments differ by moving a single particle (the 'active particle') 
-        # along the closed edge.
-        # The initial configuration of the edge group is an initial configuration of either of the vertex groups with the active particle removed.
-        # Note, removing the closed edge may further disconnect the graph, thus there may be multiple possible configurations, 
-        # corresponding to the different compatible assignments of particles to connected components of the graph minus the closed edge.
-        # There is one edge group for each compatible assignment.
-        # We therefore construct a dictionary where:
-        # - the keys are 4-tuples consisting of
-        #  -- the indices of the particle assignments of the two vertex groups
-        #  -- the edge by which the assignments differ
-        #  -- the index of a compatible assignment for the edge group in the list of all compatible assignments for that edge group;
-        # - the values are the corresponding graph braid groups.
         edge_groups = {(sorted([vertex_particle_assignments.index(assignment_1), vertex_particle_assignments.index(assignment_2)])[0], 
                         sorted([vertex_particle_assignments.index(assignment_1), vertex_particle_assignments.index(assignment_2)])[1], 
                         edge, 
@@ -125,6 +125,7 @@ class GraphBraidGroup:
                         GraphBraidGroup(graphs_minus_closed_edges[edge][1], self.num_particles - 1, self.reindex(self.generate_initial_config(compatible_assignment), [edge[0], edge[1]])) 
                         for (assignment_1, assignment_2, edge) in self.get_adjacent_assignments(edges, compatible_particles_per_component) 
                         for compatible_assignment in self.get_compatible_assignments(edges, assignment_1, assignment_2, edge)}
+        
         # Adjacency matrix of the graph of groups.
         gog_adj_matrix = [[0 for v in vertex_groups] for w in vertex_groups]
         for e in edge_groups:
@@ -134,6 +135,7 @@ class GraphBraidGroup:
             else:
                 gog_adj_matrix[e[0]][e[1]] += 1
         gog_graph = Graph(gog_adj_matrix)
+        
         return GraphOfGroups(gog_graph, vertex_groups, edge_groups)
   
     def get_compatible_particles_per_component(self, edges):

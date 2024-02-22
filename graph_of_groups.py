@@ -1,25 +1,49 @@
 #!/usr/bin/env python3
 # graph_of_groups.py - GraphOfGroups class file.
+"""
+A module for graph of groups functionality.
+
+Module contents: 
+- The `GraphOfGroups` class, which implements methods for detecting free splittings in graphs of groups.
+"""
 
 from collections import defaultdict
 
-# Class for processing graphs of groups
-# Note, monomorphisms are omitted since we do not need this data to detect free splittings.
-# For this reason, we do not need our graphs to be directed, either.
-# See [Graph of groups decompositions of graph braid groups](https://arxiv.org/pdf/2209.03860.pdf) for a description of the monomorphisms.
 class GraphOfGroups:
+    """
+    Class for processing graphs of groups.
+
+    Note, monomorphisms are omitted since we do not need this data to detect free splittings.
+    For this reason, we do not need our graphs to be directed, either.
+    See [Graph of groups decompositions of graph braid groups](https://arxiv.org/pdf/2209.03860.pdf) for a description of the monomorphisms.
+    """
+
     def __init__(self, graph, vertex_groups, edge_groups):
-        # `graph` should be an object of class `Graph`.
+        """
+        Initialises graph of groups attributes.
+
+        `graph` should be an object of class `Graph`.
+        `vertex_groups` should be a dictionary, where:
+        - keys are vertices of `graph`;
+        - values are `GraphBraidGroup` objects.
+        `edge_groups` should be a dictionary, where: 
+        - keys are edges of `graph`. Note, `graph.edges` may contain repeat entries for multi-edges. In this case, each edge 2-tuple should be augmented to a 3-tuple or a 4-tuple to make it a unique key.
+        - values are `GraphBraidGroup` objects.
+        """
         self.graph = graph
-        # `vertex_groups` should be a dictionary, with keys given by `graph.vertices`.
         self.vertex_groups = vertex_groups
-        # `edge_groups` should be a dictionary, with keys given by `graph.edges`. Note, `graph.edges` may contain repeat entries for multi-edges. 
-        # In this case, extra entries should be added to each edge 2-tuple to make it a unique key.
         self.edge_groups = edge_groups
 
-    # Returns a splitting of the fundamental group of the graph of groups as a free product of non-trivial graphs of groups, given as a tuple of the factors.
-    # Otherwise, returns the original graph of groups.
     def get_free_splitting(self):
+        """
+        Returns a splitting of the fundamental group of the graph of groups as a free product of non-trivial graphs of groups, given as a tuple of the factors. 
+        
+        Returns the splitting as a tuple where: 
+        - the first element is a string of the form 'F_n', representing any free factors;
+        - any further elements are `GraphOfGroups` objects.
+
+        If a free splitting cannot be found, returns the original `GraphOfGroups` object (i.e. `self`) as a 1-tuple.
+        """
         # Note: `is_trivial` method must be implemented for the class that the edge group is in.
         trivial_edges = [edge for edge in self.edge_groups if self.edge_groups[edge].is_trivial()]
         # Turns edges in the graph of groups (which are labelled to distinguish multi-edges) into actual edges in `graph.edges`.
@@ -69,9 +93,20 @@ class GraphOfGroups:
                 factor_gogs.append(GraphOfGroups(factor_graph, factor_vertex_groups, factor_edge_groups))
         return (f'F_{num_free_Z}',) + tuple(factor_gogs)
     
-    # Given a collection of separating edges with trivial edge groups, checks for triviality of the fundamental groups of the connected components of the 
-    # graph minus the edge, for each edge. If any are trivial, removes these components.
     def reduce(self, trivial_sep_edges):
+        """
+        Removes any connected components of the graph minus `trivial_sep_edges` that have trivial fundamental group, returning the remainder.
+
+        `trivial_sep_edges` should be a list of separating edges of the graph that have trivial edge group.
+
+        For each edge in `trivial_sep_edges`, checks for triviality of the fundamental groups of the connected components of the graph minus the edge. 
+        If any are trivial, removes these components.
+
+        Returns a 3-tuple consisting of:
+        - the reduced graph, as a (vertex set, edge set) 2-tuple;
+        - a dictionary of the vertex groups of the reduced graph;
+        - a dictionary of the edge groups of the reduced graph.
+        """
         if trivial_sep_edges == []:
             return ((self.graph.vertices, self.graph.edges), self.vertex_groups, self.edge_groups)
         trivial_components = []
@@ -107,8 +142,14 @@ class GraphOfGroups:
         else:
             return self.iterate_reduction(reduced_graph, reduced_sep_edges, trivial_components)
         
-    # Iteratively removes degree 1 vertices from `subgraph` whose vertex groups are the same as the incident edge group.
     def trim(self, subgraph):
+        """
+        Iteratively removes degree 1 vertices from `subgraph` whose vertex groups are the same as the incident edge group.
+
+        `subgraph` should be a (vertex set, edge set) 2-tuple.
+
+        Returns a 2-tuple consisting of the vertex set and edge set of the trimmed graph.
+        """
         # We trim after all trivial edges have been removed, so any remaining edge should be labelled with a non-trivial edge group.
         non_trivial_edges = [edge for edge in self.edge_groups if not self.edge_groups[edge].is_trivial()]
         non_trivial_edges_unlabelled = [(edge[0], edge[1]) for edge in non_trivial_edges]
@@ -132,6 +173,7 @@ class GraphOfGroups:
             return self.trim(reduced_graph)
         
     def is_same(self, other):
+        """Returns `True` if `self` and `other` are graphs of groups with the same graph, vertex groups, and edge groups."""
         if self.graph.adj_matrix != other.graph.adj_matrix:
             return False
         for v in self.vertex_groups:

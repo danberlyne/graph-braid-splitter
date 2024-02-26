@@ -9,11 +9,12 @@ Module contents:
 
 import copy
 from collections import defaultdict
+from types import NotImplementedType
 
 class Graph:
     """Class for performing graph computations."""
 
-    def __init__(self, adj_matrix):
+    def __init__(self, adj_matrix: list[list[int]] | tuple[tuple[int, ...], ...]) -> None:
         """
         Initialises graph attributes.
 
@@ -35,12 +36,14 @@ class Graph:
         self.num_edges = len(self.edges)
         self.essential_vertices = [v for v in self.vertices if self.get_degree(v) != 2]
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool | NotImplementedType:
         """Two graphs are equal if they have the same adjacency matrix or they both have trivial adjacency matrix."""
         trivial = ([], [[]])
+        if not isinstance(other, Graph):
+            return NotImplemented
         return self.adj_matrix == other.adj_matrix or (self.adj_matrix in trivial and other.adj_matrix in trivial)
     
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Graphs are hashed via their adjacency matrix."""
         trivial = ([], [[]])
         if self.adj_matrix in trivial:
@@ -48,7 +51,7 @@ class Graph:
         else:
             return hash(tuple(tuple(row) for row in self.adj_matrix))
 
-    def get_connected_components(self, subgraph = None):
+    def get_connected_components(self, subgraph: tuple[list[int], list[tuple[int, int]]] | tuple[tuple[int, ...], tuple[tuple[int, int], ...]] = None) -> dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], 'Graph']:
         """
         Returns dictionary of connected components of the (sub)graph.
 
@@ -73,7 +76,7 @@ class Graph:
                 components.update({new_component[0]: new_component[1]})
         return components
 
-    def get_component(self, vertex, subgraph = None):
+    def get_component(self, vertex: int, subgraph: tuple[list[int], list[tuple[int, int]]] | tuple[tuple[int, ...], tuple[tuple[int, int], ...]] = None) -> tuple[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], 'Graph']:
         """
         Returns a 2-tuple representing the connected component of the (sub)graph containing the given vertex.
         
@@ -104,7 +107,7 @@ class Graph:
                 component_adj_matrix[v0][v1] += 1
         return ((tuple(component_vertices), tuple(component_edges)), Graph(component_adj_matrix))
     
-    def iterate_component(self, component_vertices, component_edges, current_vertex, subgraph = None):
+    def iterate_component(self, component_vertices: list[int], component_edges: list[tuple[int, int]], current_vertex: int, subgraph: tuple[list[int], list[tuple[int, int]]] | tuple[tuple[int, ...], tuple[tuple[int, int], ...]] = None) -> None:
         if subgraph is None:
             subgraph = (self.vertices, self.edges)
         for edge in subgraph[1]:
@@ -116,11 +119,11 @@ class Graph:
                     component_vertices.append(adjacent_vertex)
                     self.iterate_component(component_vertices, component_edges, adjacent_vertex, subgraph)
 
-    def get_num_connected_components(self):
+    def get_num_connected_components(self) -> int:
         """Returns the number of connected components of the graph."""
         return len(self.get_connected_components())
 
-    def get_graph_minus_open_edges(self, removed_edges):
+    def get_graph_minus_open_edges(self, removed_edges: list[tuple[int, int]]) -> tuple[tuple[list[int], list[tuple[int, int]]], 'Graph']:
         """
         Returns a 2-tuple representing the graph minus the given edges, considered as open edges.
 
@@ -143,7 +146,7 @@ class Graph:
             subgraph_edges.remove((i, j))
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_open_edges))
 
-    def get_graph_minus_closed_edge(self, removed_edge):
+    def get_graph_minus_closed_edge(self, removed_edge: tuple[int, int]) -> tuple[tuple[list[int], list[tuple[int, int]]], 'Graph']:
         """
         Returns a 2-tuple representing the graph minus the given edge, considered as a closed edge.
 
@@ -164,7 +167,7 @@ class Graph:
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_closed_edge))
 
 
-    def get_graph_minus_vertex(self, removed_vertex):
+    def get_graph_minus_vertex(self, removed_vertex: int) -> tuple[tuple[list[int], list[tuple[int, int]]], 'Graph']:
         """
         Returns a 2-tuple representing the graph minus the given vertex.
 
@@ -183,7 +186,7 @@ class Graph:
         adj_matrix_minus_vertex = [[self.adj_matrix[k][m] for m in range(len(self.adj_matrix[k])) if m != removed_vertex] for k in range(len(self.adj_matrix)) if k != removed_vertex]
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_vertex))
 
-    def prune(self, edges):
+    def prune(self, edges: list[tuple[int, int]]) -> tuple['Graph', list[tuple[int, int]]]:
         """
         Iteratively checks whether the given edges are non-separating and removes them if so, returning the pruned graph and a list of removed edges.
         
@@ -193,7 +196,9 @@ class Graph:
         `edges` should be a list of candidate edges in `self.edges` for pruning.
         Edges are 2-tuples of integers corresponding to the row number and column number in the adjacency matrix.
 
-        Returns a (vertex set, edge set) 2-tuple representing the pruned graph.
+        Returns a 2-tuple consisting of: 
+        - a `Graph` object representing the pruned graph;
+        - a list of the removed edges.
         """
         modified_graph = self
         removed_edges = []
@@ -205,7 +210,7 @@ class Graph:
                 modified_graph = modified_graph_minus_edge
         return (modified_graph, removed_edges)
 
-    def is_separating(self, edge):
+    def is_separating(self, edge: tuple[int, int]) -> bool:
         """
         Returns True if the given edge separates the graph into more connected components.
         
@@ -217,7 +222,7 @@ class Graph:
         else:
             return False
     
-    def get_degree(self, vertex):
+    def get_degree(self, vertex: int) -> int:
         """
         Returns the degree of the given vertex in the graph.
         
@@ -232,7 +237,7 @@ class Graph:
                 degree += 1
         return degree
     
-    def get_centreless_ball(self, vertex, distance):
+    def get_centreless_ball(self, vertex: int, distance: int) -> list[int]:
         """
         Returns a list of all vertices that can be reached from the given vertex via a path of length at least 1 and at most the given distance.
 
@@ -250,7 +255,7 @@ class Graph:
             self.iterate_ball(ball, remaining_edges, vertex, distance)
         return ball
     
-    def iterate_ball(self, ball, remaining_edges, current_vertex, remaining_distance):
+    def iterate_ball(self, ball: list[int], remaining_edges: dict[tuple[int, int], int], current_vertex: int, remaining_distance: int) -> None:
         for edge in self.edges:
             if current_vertex in edge and remaining_edges[edge] > 0:
                 adjacent_vertex = edge[edge.index(current_vertex) - 1]
@@ -260,7 +265,7 @@ class Graph:
                     if remaining_distance >= 2:
                         self.iterate_ball(ball, remaining_edges, adjacent_vertex, remaining_distance - 1)
 
-    def make_essential(self):
+    def make_essential(self) -> 'Graph':
         """
         Removes vertices of degree 2 from the graph until only essential vertices remain, returning the essential graph.
         

@@ -8,6 +8,9 @@ Module contents:
 """
 
 from collections import defaultdict
+from graph import Graph
+from graph_braid_group import GraphBraidGroup
+from types import NotImplementedType
 
 class GraphOfGroups:
     """
@@ -18,7 +21,7 @@ class GraphOfGroups:
     See [Graph of groups decompositions of graph braid groups](https://arxiv.org/pdf/2209.03860.pdf) for a description of the monomorphisms.
     """
 
-    def __init__(self, graph, vertex_groups, edge_groups):
+    def __init__(self, graph: Graph, vertex_groups: dict[int, GraphBraidGroup], edge_groups: dict[tuple[int, int] | tuple[int, int, tuple[int, int], int], GraphBraidGroup]) -> None:
         """
         Initialises graph of groups attributes.
 
@@ -27,14 +30,16 @@ class GraphOfGroups:
         - keys are vertices of `graph`;
         - values are `GraphBraidGroup` objects.
         `edge_groups` should be a dictionary, where: 
-        - keys are edges of `graph`. Note, `graph.edges` may contain repeat entries for multi-edges. In this case, each edge 2-tuple should be augmented to a 3-tuple or a 4-tuple to make it a unique key.
+        - keys are edges of `graph`. 
+        -- Note, `graph.edges` may contain repeat entries for multi-edges. In this case, each edge 2-tuple should be augmented to a 4-tuple to make it a unique key.
+        -- See `GraphBraidGroup.get_graph_of_groups()` to see how an edge should be augmented to a 4-tuple.
         - values are `GraphBraidGroup` objects.
         """
         self.graph = graph
         self.vertex_groups = vertex_groups
         self.edge_groups = edge_groups
 
-    def get_free_splitting(self):
+    def get_free_splitting(self) -> tuple[str | 'GraphOfGroups', ...]:
         """
         Returns a splitting of the fundamental group of the graph of groups as a free product of non-trivial graphs of groups, given as a tuple of the factors. 
         
@@ -93,7 +98,7 @@ class GraphOfGroups:
                 factor_gogs.append(GraphOfGroups(factor_graph, factor_vertex_groups, factor_edge_groups))
         return (f'F_{num_free_Z}',) + tuple(factor_gogs)
     
-    def reduce(self, trivial_sep_edges):
+    def reduce(self, trivial_sep_edges: list[tuple[int, int] | tuple[int, int, tuple[int, int], int]]) -> tuple[tuple[list[int], list[tuple[int, int] | tuple[int, int, tuple[int, int], int]]], dict[int, GraphBraidGroup], dict[tuple[int, int] | tuple[int, int, tuple[int, int], int], GraphBraidGroup]]:
         """
         Removes any connected components of the graph minus `trivial_sep_edges` that have trivial fundamental group, returning the remainder.
 
@@ -120,7 +125,7 @@ class GraphOfGroups:
         # Need to convert above from subgraph form to Graph form.
         return (reduced_graph, reduced_vertex_groups, reduced_edge_groups)
 
-    def iterate_reduction(self, subgraph, trivial_sep_edges, trivial_components):
+    def iterate_reduction(self, subgraph: tuple[list[int], list[tuple[int, int] | tuple[int, int, tuple[int, int], int]]], trivial_sep_edges: list[tuple[int, int] | tuple[int, int, tuple[int, int], int]], trivial_components: list[tuple[tuple[int, ...], tuple[tuple[int, int], ...]]]) -> tuple[list[int], list[tuple[int, int] | tuple[int, int, tuple[int, int], int]]]:
         edge = trivial_sep_edges[0]
         graph_minus_edge = (subgraph[0], [e for e in subgraph[1] if e != edge])
         components = self.graph.get_connected_components(graph_minus_edge)
@@ -142,7 +147,7 @@ class GraphOfGroups:
         else:
             return self.iterate_reduction(reduced_graph, reduced_sep_edges, trivial_components)
         
-    def trim(self, subgraph):
+    def trim(self, subgraph: tuple[tuple[int, ...], tuple[tuple[int, int], ...]]) -> tuple[tuple[int, ...], tuple[tuple[int, int], ...]]:
         """
         Iteratively removes degree 1 vertices from `subgraph` whose vertex groups are the same as the incident edge group.
 
@@ -172,8 +177,10 @@ class GraphOfGroups:
         else:
             return self.trim(reduced_graph)
         
-    def is_same(self, other):
+    def is_same(self, other: 'GraphOfGroups') -> bool | NotImplementedType:
         """Returns `True` if `self` and `other` are graphs of groups with the same graph, vertex groups, and edge groups."""
+        if not isinstance(other, GraphOfGroups):
+            return NotImplemented
         if self.graph.adj_matrix != other.graph.adj_matrix:
             return False
         for v in self.vertex_groups:

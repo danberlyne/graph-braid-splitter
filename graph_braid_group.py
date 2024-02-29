@@ -14,8 +14,14 @@ import itertools
 from collections import defaultdict
 from graph import Graph
 from graph_of_groups import GraphOfGroups
+from collections.abc import Iterator
+from typing import Union
+from types import NotImplementedType
 
-def integer_partitions(total_sum, num_parts):
+# Recursive type used for free splittings returned by `get_splitting()`.
+NestedFactorList = list[Union[GraphOfGroups, 'GraphBraidGroup', 'NestedFactorList']]
+
+def integer_partitions(total_sum: int, num_parts: int) -> Iterator[tuple[int, ...]]:
     """
     Returns all the different partitions of a non-negative integer as a sum of a fixed number of non-negative integers.
     
@@ -32,7 +38,7 @@ def integer_partitions(total_sum, num_parts):
             for partition in integer_partitions(total_sum - value, num_parts - 1):
                 yield (value,) + partition
 
-def is_same(adj_matrix_1, adj_matrix_2):
+def is_same(adj_matrix_1: list[list[int]] | tuple[tuple[int, ...], ...], adj_matrix_2: list[list[int]] | tuple[tuple[int, ...], ...]) -> bool:
     """
     Takes as input two adjacency matrices and returns True if they define the same graph.
 
@@ -52,7 +58,7 @@ class GraphBraidGroup:
     Note: This handles reduced graph braid groups, which are only isomorphic to the graph braid group if `is_reduced` returns True.
     """
 
-    def __init__(self, graph, num_particles, initial_config = None):
+    def __init__(self, graph: Graph, num_particles: int, initial_config: list[int] = None) -> None:
         """
         Initialises graph braid group attributes.
 
@@ -76,7 +82,7 @@ class GraphBraidGroup:
         self.num_initial_particles_per_component = self.get_num_particles_per_component(self.initial_config)
         self.num_connected_components = math.comb(self.num_particles + self.graph.get_num_connected_components() - 1, self.graph.get_num_connected_components() - 1)
 
-    def get_graph_of_groups(self, edges):
+    def get_graph_of_groups(self, edges: list[tuple[int, int]]) -> GraphOfGroups:
         """
         Returns the graph of groups decomposition given by splitting along the edges of `graph` in list `edges`.
         
@@ -138,7 +144,7 @@ class GraphBraidGroup:
         
         return GraphOfGroups(gog_graph, vertex_groups, edge_groups)
   
-    def get_compatible_particles_per_component(self, edges):
+    def get_compatible_particles_per_component(self, edges: list[tuple[int, int]]) -> list[dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int]]:
         """
         Returns a list of dictionaries, where each dictionary assigns a number of particles to each component of the graph minus the open edges in `edges`.
         
@@ -179,7 +185,7 @@ class GraphBraidGroup:
             compatible_particles_per_component[i].update(new_particles_per_component[i])
         return compatible_particles_per_component
     
-    def has_sufficient_capacity(self, components, partition):
+    def has_sufficient_capacity(self, components: list[tuple[tuple[int, ...], tuple[tuple[int, int], ...]]], partition: tuple[int, ...]) -> bool:
         """
         Returns True if each component has at least as many vertices as the corresponding integer in the partition.
 
@@ -191,7 +197,7 @@ class GraphBraidGroup:
                 return False
         return True
     
-    def get_num_particles_per_component(self, config):
+    def get_num_particles_per_component(self, config: list[int]) -> dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int]:
         """
         Returns the number of particles that `config` has in each connected component of the graph.
 
@@ -209,7 +215,7 @@ class GraphBraidGroup:
                 num_particles_per_component[self.graph.get_component(v)[0]] += 1
         return num_particles_per_component
 
-    def generate_initial_config(self, particles_per_component):
+    def generate_initial_config(self, particles_per_component: dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int]) -> list[int]:
         """
         Given the connected components of a subgraph and the number of particles in each component, returns a configuration of particles on the subgraph with that number of particles in each component.
         
@@ -222,7 +228,7 @@ class GraphBraidGroup:
         initial_config_by_component = [[component[0][i] for i in range(particles_per_component[component])] for component in particles_per_component]
         return [vertex for component_config in initial_config_by_component for vertex in component_config]
     
-    def get_adjacent_assignments(self, edges, particle_assignments):
+    def get_adjacent_assignments(self, edges: list[tuple[int, int]], particle_assignments: list[dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int]]) -> list[tuple[dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int], dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int], tuple[int, int]]]:
         """
         Given a graph minus some open edges, returns pairs of particle assignments that differ by moving a single particle along a removed edge.
 
@@ -263,7 +269,7 @@ class GraphBraidGroup:
                             adjacent_assignments.append((assignment_2, assignment_1, edge))
         return adjacent_assignments
 
-    def get_compatible_assignments(self, edges, assignment_1, assignment_2, active_edge):
+    def get_compatible_assignments(self, edges: list[tuple[int, int]], assignment_1: dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int], assignment_2: dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int], active_edge: tuple[int, int]) -> list[dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], int]]:
         """
         Given two particle assignments that differ by moving a single particle along an open edge, returns all compatible assignments of particles to the graph minus the closed version of that edge.
 
@@ -328,7 +334,7 @@ class GraphBraidGroup:
             compatible_assignments[i].update(new_assignments[i])
         return compatible_assignments
 
-    def reindex(self, old_vertices, removed_vertices):
+    def reindex(self, old_vertices: list[int], removed_vertices: list[int]) -> list[int]:
         """
         Reindexes vertices of the graph after removal of some of the other vertices, returning the new indices.
         
@@ -346,7 +352,7 @@ class GraphBraidGroup:
             new_vertices.append(v)
         return new_vertices
 
-    def is_trivial(self):
+    def is_trivial(self) -> bool:
         """Returns `True` if the graph braid group is the trivial group."""
         components = self.graph_components
         # Check if any connected components of the graph have non-trivial braid group.
@@ -364,7 +370,7 @@ class GraphBraidGroup:
                         return False
         return True
     
-    def is_reduced(self):
+    def is_reduced(self) -> bool:
         """Returns `True` if the braid group of the graph is isomorphic to the reduced braid group of the graph."""
         components = self.graph_components
         for comp in self.num_initial_particles_per_component:
@@ -381,7 +387,7 @@ class GraphBraidGroup:
                             return False
         return True
     
-    def get_splitting(self):
+    def get_splitting(self) -> NestedFactorList:
         """
         Returns a splitting of the graph braid group into free factors and direct factors.
 
@@ -395,7 +401,7 @@ class GraphBraidGroup:
         self.iterate_splitting(final_splitting)
         return final_splitting
 
-    def iterate_splitting(self, current_splitting):
+    def iterate_splitting(self, current_splitting: NestedFactorList) -> None:
         # Filter out the trivial factors of the graph braid group.
         non_trivial_direct_factors = self.factorise()
         # Split each non-trivial factor.
@@ -433,7 +439,7 @@ class GraphBraidGroup:
                         next_free_splitting.append(next_direct_splitting)
                 current_splitting.append(next_free_splitting)
 
-    def factorise(self):
+    def factorise(self) -> list['GraphBraidGroup']:
         """Returns a list of the non-trivial direct factors of the graph braid group, as `GraphBraidGroup` objects."""
         non_trivial_factors = []
         for comp in self.graph_components:
@@ -445,12 +451,14 @@ class GraphBraidGroup:
                     non_trivial_factors.append(gbg_factor)
         return non_trivial_factors
     
-    def is_same(self, gbg):
+    def is_same(self, gbg: 'GraphBraidGroup') -> bool | NotImplementedType:
         """
         Returns `True` if the non-trivial factors of `self` have the same graphs and same numbers of particles as those of the GraphBraidGroup object `gbg`.
         
         Note, if both graph braid groups are reduced then it is sufficient for their graphs to be homeomorphic instead of being identical.
         """
+        if not isinstance(gbg, GraphBraidGroup):
+            return NotImplemented
         non_trivial_factors_1 = self.factorise()
         non_trivial_factors_2 = gbg.factorise()
         has_same_factor = False

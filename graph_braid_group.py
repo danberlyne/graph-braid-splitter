@@ -15,7 +15,7 @@ from collections import defaultdict
 from graph import Graph
 from graph_of_groups import GraphOfGroups
 from collections.abc import Iterator
-from typing import Union
+from typing import Union, Optional
 from types import NotImplementedType
 
 # Recursive type used for free splittings returned by `get_splitting()`.
@@ -58,7 +58,7 @@ class GraphBraidGroup:
     Note: This handles reduced graph braid groups, which are only isomorphic to the graph braid group if `is_reduced` returns True.
     """
 
-    def __init__(self, graph: Graph, num_particles: int, initial_config: list[int] = None) -> None:
+    def __init__(self, graph: Graph, num_particles: int, initial_config: Optional[list[int]] = None) -> None:
         """
         Initialises graph braid group attributes.
 

@@ -33,6 +33,11 @@ from collections import defaultdict
 from graph import Graph
 from graph_of_groups import GraphOfGroups
 from graph_braid_group import GraphBraidGroup
+from typing import Union
+
+# Recursive types used for free splittings.
+NestedFactorList = list[Union[GraphOfGroups, 'GraphBraidGroup', 'NestedFactorList']]
+StringifiedNestedFactorList = list[Union[str, 'StringifiedNestedFactorList']]
 
 MatrixDimensionException = Exception('Adjacency matrix must be square.')
 MatrixFormatException = Exception('Adjacency matrix must either only contain positive integers and spaces or use the list of lists format.')
@@ -43,14 +48,14 @@ ConfigDimensionException = Exception('Number of integers in initial configuratio
 ConfigFormatException = Exception('Initial configuration must only contain spaces and integers between 1 and the number of rows in the adjacency matrix.')
 VertexException = Exception('Each connected component of the graph must have at least as many vertices as particles starting in that component.')
 
-def start_exit_sequence():
+def start_exit_sequence() -> None:
     """Prompts the user to press Enter to exit the program."""
     while True:
         exit_sequence = input('Press [Enter] to exit.')
         if not exit_sequence:
             sys.exit()
 
-def enter_data_manually():
+def enter_data_manually() -> tuple[int, list[list[int]], list[int] | None]:
     """Prompts user to enter data manually if it has not been entered in `gbg_data.txt`."""
     while True:
         print('No data detected in gbg_data.txt. Enter data manually? (y/n)')
@@ -63,14 +68,14 @@ def enter_data_manually():
             initial_config = enter_config(num_particles, adj_matrix)
             return(num_particles, adj_matrix, initial_config)
 
-def prompt_data_entry():
+def prompt_data_entry() -> None:
     """Prompts user to enter data in `gbg_data.txt` and exits the program."""
     while True:
         exit_sequence = input('Please enter your data in gbg_data.txt then run the script again. Press [Enter] to exit.')
         if not exit_sequence:
             sys.exit()
 
-def enter_particles():
+def enter_particles() -> int:
     """Prompts manual entry of number of particles of the graph braid group."""
     while True:
         particle_response = input('Please enter the number of particles/strands in the graph braid group:\n')
@@ -82,7 +87,7 @@ def enter_particles():
         else:
             print('The number of particles must be a positive integer.')
 
-def enter_matrix():
+def enter_matrix() -> list[list[int]]:
     """Prompts manual entry of adjacency matrix of the graph braid group, one row at a time."""
     while True:
         matrix_response_1 = input('Please enter the first row of the adjacency matrix of the graph, with entries separated by single spaces:\n').split()
@@ -100,7 +105,7 @@ def enter_matrix():
                             break
             return [[int(entry) for entry in matrix_response[i]] for i in range(len(matrix_response_1))]
         
-def verify_matrix_formatting(initial_matrix_response, current_matrix_response, row_num):
+def verify_matrix_formatting(initial_matrix_response: list[str], current_matrix_response: list[str], row_num: int) -> bool:
     """
     Returns `True` if the given row of the adjacency matrix has been entered in the correct format.
     
@@ -131,12 +136,12 @@ def verify_matrix_formatting(initial_matrix_response, current_matrix_response, r
         return False
     return True
 
-def verify_symmetric(matrix_response, current_matrix_response, row_num):
+def verify_symmetric(matrix_response: list[list[str]], current_matrix_response: list[str], row_num: int) -> bool:
     """
     Returns `True` if the given row of the adjacency matrix maintains symmetry of the overall matrix.
     
     `matrix_response` should be the rows of the matrix that have already been checked, as a list of lists of strings.
-    `current_matrix_response` should be the row of the entered matrix that is currently being checked, as a list of integers.
+    `current_matrix_response` should be the row of the entered matrix that is currently being checked, as a list of strings.
     `row_num` should be the row number (starting from 1) of the row of the entered matrix that is currently being checked.
 
     Returns `True` if the values of `current_matrix_response` match the values of `matrix_response` that lie in column `row_num`.
@@ -147,7 +152,7 @@ def verify_symmetric(matrix_response, current_matrix_response, row_num):
             return False
     return True
         
-def enter_config(num_particles, adj_matrix):
+def enter_config(num_particles: int, adj_matrix: list[list[int]]) -> list[int] | None:
     """
     Prompts manual user entry of initial configuration of the graph braid group and returns the configuration if entered correctly.
     
@@ -165,7 +170,7 @@ def enter_config(num_particles, adj_matrix):
             if correct_formatting:
                 return [int(entry) - 1 for entry in config_response]
             
-def verify_config_formatting(config_response, num_particles, adj_matrix):
+def verify_config_formatting(config_response: list[str], num_particles: int, adj_matrix: list[list[int]]) -> bool:
     """
     Returns `True` if the initial configuration has been entered in the correct format.
     
@@ -189,7 +194,7 @@ def verify_config_formatting(config_response, num_particles, adj_matrix):
             return False
     return True
 
-def get_data_from_file(gbg_data):
+def get_data_from_file(gbg_data: list[str]) -> tuple[int, list[list[int]], list[int] | None]:
     """
     Returns the number of particles, adjacency matrix, and initial configuration that were entered in `gbg_data.txt`.
 
@@ -205,7 +210,7 @@ def get_data_from_file(gbg_data):
     initial_config = convert_config_data(gbg_data, num_particles, adj_matrix)
     return (num_particles, adj_matrix, initial_config)
 
-def convert_particle_data(gbg_data):
+def convert_particle_data(gbg_data: list[str]) -> int:
     """
     Converts the number of particles found in `gbg_data.txt` to integer format and returns it.
 
@@ -220,7 +225,7 @@ def convert_particle_data(gbg_data):
     else: 
         raise ParticleFormatException
 
-def is_list_format(gbg_data):
+def is_list_format(gbg_data: list[str])-> bool:
     """
     Returns `True` if the adjacency matrix found in `gbg_data.txt` was entered in list of lists format.
 
@@ -231,7 +236,7 @@ def is_list_format(gbg_data):
     else:
         return False
 
-def convert_matrix_data_list(gbg_data):
+def convert_matrix_data_list(gbg_data: list[str]) -> list[list[int]]:
     """
     Converts the adjacency matrix found in `gbg_data.txt` to a list of lists of integers and returns it.
 
@@ -255,7 +260,7 @@ def convert_matrix_data_list(gbg_data):
                 raise MatrixSymmetryException
     return [[int(string_matrix[i][j]) for j in range(len(string_matrix))] for i in range(len(string_matrix))]
 
-def convert_matrix_data_lines(gbg_data):
+def convert_matrix_data_lines(gbg_data: list[str]) -> list[list[int]]:
     """
     Converts the adjacency matrix found in `gbg_data.txt` to a list of lists of integers and returns it.
 
@@ -281,7 +286,7 @@ def convert_matrix_data_lines(gbg_data):
                 raise MatrixSymmetryException
     return adj_matrix
 
-def convert_config_data(gbg_data, num_particles, adj_matrix):
+def convert_config_data(gbg_data: list[str], num_particles: int, adj_matrix: list[list[int]]) -> list[int] | None:
     """
     Converts the initial configuration found in `gbg_data.txt` (if it exists) to a list of integers and returns it.
 
@@ -311,7 +316,7 @@ def convert_config_data(gbg_data, num_particles, adj_matrix):
                 raise ConfigFormatException
     return [int(entry) - 1 for entry in config_data]
 
-def stringify_factors(splitting, braid_factor_counter, gog_factor_counter):
+def stringify_factors(splitting: NestedFactorList, braid_factor_counter: int, gog_factor_counter: int) -> None:
     """
     Recursively replaces all factors in a splitting with string versions and adds detailed data to `splitting.txt` where appropriate.
 
@@ -381,7 +386,7 @@ def stringify_factors(splitting, braid_factor_counter, gog_factor_counter):
         elif isinstance(factor, list):
             stringify_factors(factor, braid_factor_counter, gog_factor_counter)
 
-def get_known_gbgs_from_file():
+def get_known_gbgs_from_file() -> dict[tuple[tuple[tuple[int, ...], ...], int], str]:
     """
     Gets list of known graph braid groups from `known_gbgs.txt` and returns them as a dictionary.
 
@@ -401,7 +406,7 @@ def get_known_gbgs_from_file():
             known_gbgs_unordered.setdefault((permuted_matrix, particles), known_gbgs[(matrix, particles)])
     return known_gbgs_unordered
 
-def is_same(adj_matrix_1, adj_matrix_2):
+def is_same(adj_matrix_1: list[list[int]] | tuple[tuple[int, ...], ...], adj_matrix_2: list[list[int]] | tuple[tuple[int, ...], ...]) -> bool:
     """
     Takes as input two adjacency matrices and returns `True` if they define the same graph.
 
@@ -417,7 +422,7 @@ def is_same(adj_matrix_1, adj_matrix_2):
     else:
         return False
 
-def combine_strings(stringified_splitting, is_direct = True):
+def combine_strings(stringified_splitting: StringifiedNestedFactorList, is_direct: bool = True) -> list[str]:
     """
     Converts a stringified splitting into a list of strings and returns it, where each string represents the splitting of a direct factor of the original group. 
     
@@ -468,7 +473,7 @@ def combine_strings(stringified_splitting, is_direct = True):
 # Main code #
 #############
 
-def main():
+def main() -> None:
     """Implements command line interface."""
     print('Checking gbg_data.txt...')
     with open('gbg_data.txt') as file:

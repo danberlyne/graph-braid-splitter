@@ -10,7 +10,11 @@ Module contents:
 import copy
 from collections import defaultdict
 from types import NotImplementedType
-from typing import Optional
+from typing import Optional, Union, TypeAlias
+
+SubgraphMutable: TypeAlias = tuple[list[int], list[tuple[int, int]]]
+SubgraphImmutable: TypeAlias = tuple[tuple[int, ...], tuple[tuple[int, int], ...]]
+SubgraphAny: TypeAlias = Union[SubgraphMutable, SubgraphImmutable]
 
 class Graph:
     """Class for performing graph computations."""
@@ -52,7 +56,7 @@ class Graph:
         else:
             return hash(tuple(tuple(row) for row in self.adj_matrix))
 
-    def get_connected_components(self, subgraph: Optional[tuple[list[int], list[tuple[int, int]]] | tuple[tuple[int, ...], tuple[tuple[int, int], ...]]] = None) -> dict[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], 'Graph']:
+    def get_connected_components(self, subgraph: Optional[SubgraphAny] = None) -> dict[SubgraphImmutable, 'Graph']:
         """
         Returns dictionary of connected components of the (sub)graph.
 
@@ -77,7 +81,7 @@ class Graph:
                 components.update({new_component[0]: new_component[1]})
         return components
 
-    def get_component(self, vertex: int, subgraph: Optional[tuple[list[int], list[tuple[int, int]]] | tuple[tuple[int, ...], tuple[tuple[int, int], ...]]] = None) -> tuple[tuple[tuple[int, ...], tuple[tuple[int, int], ...]], 'Graph']:
+    def get_component(self, vertex: int, subgraph: Optional[SubgraphAny] = None) -> tuple[SubgraphImmutable, 'Graph']:
         """
         Returns a 2-tuple representing the connected component of the (sub)graph containing the given vertex.
         
@@ -108,7 +112,12 @@ class Graph:
                 component_adj_matrix[v0][v1] += 1
         return ((tuple(component_vertices), tuple(component_edges)), Graph(component_adj_matrix))
     
-    def iterate_component(self, component_vertices: list[int], component_edges: list[tuple[int, int]], current_vertex: int, subgraph: Optional[tuple[list[int], list[tuple[int, int]]] | tuple[tuple[int, ...], tuple[tuple[int, int], ...]]] = None) -> None:
+    def iterate_component(self, 
+                          component_vertices: list[int], 
+                          component_edges: list[tuple[int, int]], 
+                          current_vertex: int, 
+                          subgraph: Optional[SubgraphAny] = None
+                          ) -> None:
         if subgraph is None:
             subgraph = (self.vertices, self.edges)
         for edge in subgraph[1]:
@@ -124,7 +133,7 @@ class Graph:
         """Returns the number of connected components of the graph."""
         return len(self.get_connected_components())
 
-    def get_graph_minus_open_edges(self, removed_edges: list[tuple[int, int]]) -> tuple[tuple[list[int], list[tuple[int, int]]], 'Graph']:
+    def get_graph_minus_open_edges(self, removed_edges: list[tuple[int, int]]) -> tuple[SubgraphMutable, 'Graph']:
         """
         Returns a 2-tuple representing the graph minus the given edges, considered as open edges.
 
@@ -147,7 +156,7 @@ class Graph:
             subgraph_edges.remove((i, j))
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_open_edges))
 
-    def get_graph_minus_closed_edge(self, removed_edge: tuple[int, int]) -> tuple[tuple[list[int], list[tuple[int, int]]], 'Graph']:
+    def get_graph_minus_closed_edge(self, removed_edge: tuple[int, int]) -> tuple[SubgraphMutable, 'Graph']:
         """
         Returns a 2-tuple representing the graph minus the given edge, considered as a closed edge.
 
@@ -168,7 +177,7 @@ class Graph:
         return ((subgraph_vertices, subgraph_edges), Graph(adj_matrix_minus_closed_edge))
 
 
-    def get_graph_minus_vertex(self, removed_vertex: int) -> tuple[tuple[list[int], list[tuple[int, int]]], 'Graph']:
+    def get_graph_minus_vertex(self, removed_vertex: int) -> tuple[SubgraphMutable, 'Graph']:
         """
         Returns a 2-tuple representing the graph minus the given vertex.
 
@@ -256,7 +265,12 @@ class Graph:
             self.iterate_ball(ball, remaining_edges, vertex, distance)
         return ball
     
-    def iterate_ball(self, ball: list[int], remaining_edges: dict[tuple[int, int], int], current_vertex: int, remaining_distance: int) -> None:
+    def iterate_ball(self, 
+                     ball: list[int], 
+                     remaining_edges: dict[tuple[int, int], int], 
+                     current_vertex: int, 
+                     remaining_distance: int
+                     ) -> None:
         for edge in self.edges:
             if current_vertex in edge and remaining_edges[edge] > 0:
                 adjacent_vertex = edge[edge.index(current_vertex) - 1]

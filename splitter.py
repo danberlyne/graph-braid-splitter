@@ -33,11 +33,11 @@ from collections import defaultdict
 from graph import Graph
 from graph_of_groups import GraphOfGroups
 from graph_braid_group import GraphBraidGroup
-from typing import Union
+from typing import Union, TypeAlias
 
 # Recursive types used for free splittings.
-NestedFactorList = list[Union[GraphOfGroups, 'GraphBraidGroup', 'NestedFactorList']]
-StringifiedNestedFactorList = list[Union[str, 'StringifiedNestedFactorList']]
+NestedFactorList: TypeAlias = list[Union[GraphOfGroups, 'GraphBraidGroup', 'NestedFactorList']]
+StringifiedNestedFactorList: TypeAlias = list[Union[str, 'StringifiedNestedFactorList']]
 
 MatrixDimensionException = Exception('Adjacency matrix must be square.')
 MatrixFormatException = Exception('Adjacency matrix must either only contain positive integers and spaces or use the list of lists format.')
@@ -386,7 +386,11 @@ def stringify_factors(splitting: NestedFactorList, braid_factor_counter: int, go
         elif isinstance(factor, list):
             stringify_factors(factor, braid_factor_counter, gog_factor_counter)
 
-def get_known_gbgs_from_file() -> dict[tuple[tuple[tuple[int, ...], ...], int], str]:
+def get_known_gbgs_from_file() -> dict[tuple[
+                                            tuple[tuple[int, ...], ...], 
+                                            int
+                                            ], 
+                                        str]:
     """
     Gets list of known graph braid groups from `known_gbgs.txt` and returns them as a dictionary.
 

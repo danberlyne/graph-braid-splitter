@@ -9,9 +9,10 @@ Module contents:
 
 from collections import defaultdict
 from graph import Graph
-from graph_braid_group import GraphBraidGroup
 from types import NotImplementedType
-from typing import TypeAlias, Union
+from typing import TypeAlias, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from graph_braid_group import GraphBraidGroup
 
 SubgraphImmutable: TypeAlias = tuple[tuple[int, ...], tuple[tuple[int, int], ...]]
 DecoratedEdge: TypeAlias = Union[tuple[int, int], tuple[int, int, tuple[int, int], int]]
@@ -28,8 +29,8 @@ class GraphOfGroups:
 
     def __init__(self, 
                  graph: Graph, 
-                 vertex_groups: dict[int, GraphBraidGroup], 
-                 edge_groups: dict[DecoratedEdge, GraphBraidGroup]
+                 vertex_groups: dict[int, 'GraphBraidGroup'], 
+                 edge_groups: dict[DecoratedEdge, 'GraphBraidGroup']
                  ) -> None:
         """
         Initialises graph of groups attributes.
@@ -48,7 +49,7 @@ class GraphOfGroups:
         self.vertex_groups = vertex_groups
         self.edge_groups = edge_groups
 
-    def get_free_splitting(self) -> tuple[str | 'GraphOfGroups', ...]:
+    def get_free_splitting(self) -> tuple[Union[str, 'GraphOfGroups'], ...]:
         """
         Returns a splitting of the fundamental group of the graph of groups as a free product of non-trivial graphs of groups, given as a tuple of the factors. 
         
@@ -110,8 +111,8 @@ class GraphOfGroups:
     def reduce(self, 
                trivial_sep_edges: list[DecoratedEdge]
                ) -> tuple[DecoratedSubgraphMutable, 
-                          dict[int, GraphBraidGroup], 
-                          dict[DecoratedEdge, GraphBraidGroup]]:
+                          dict[int, 'GraphBraidGroup'], 
+                          dict[DecoratedEdge, 'GraphBraidGroup']]:
         """
         Removes any connected components of the graph minus `trivial_sep_edges` that have trivial fundamental group, returning the remainder.
 
